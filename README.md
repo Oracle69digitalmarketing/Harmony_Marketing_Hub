@@ -1,30 +1,36 @@
-# Build another app
+# 📦 Harmony Marketing Hub — v0 Deployment Sync
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+This repository is automatically synced with your deployed chats on v0.dev. Any changes made through the v0 interface are pushed directly to this repository and deployed via Vercel.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/oracle69/v0-build-another-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/YlF7FDgZorQ)
+---
 
-## Overview
+## 🚀 Live Deployment
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+Your project is live at:  
+🔗 https://vercel.com/oracle69/v0-build-another-app
 
-## Deployment
+---
 
-Your project is live at:
+🛠️ Continue Building
 
-**[https://vercel.com/oracle69/v0-build-another-app](https://vercel.com/oracle69/v0-build-another-app)**
+Keep iterating on your app using the v0.dev interface:  
+🔗 https://v0.dev/chat/projects/YlF7FDgZorQ
 
-## Build your app
+---
 
-Continue building your app on:
+## 🔄 How It Works
 
-**[https://v0.dev/chat/projects/YlF7FDgZorQ](https://v0.dev/chat/projects/YlF7FDgZorQ)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
+1. Create and modify your project using v0.dev
 2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+3. Automatic sync: Changes are pushed to this GitHub repository
+4. Vercel deploys the latest version from this repo
+
+---
+
+## 📁 Repo Info
+
+- Branch: main
+- Last sync commit: 266abd8  
+  chore: sync main changes to HarmonyMarketingHub--x2  
+- Contributors: v0[bot], Oracle69digitalmarketing
+
