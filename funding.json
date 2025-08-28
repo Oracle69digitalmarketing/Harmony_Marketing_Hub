@@ -8,6 +8,7 @@
     "description": "A digital strategist and developer focused on building intelligent, scalable solutions. This work, including Harmony Marketing Hub, is built on FOSS principles.",
     "webpageUrl": {
       "url": "https://oracle69.com"
+          "wellKnown": ""
     }
   },
   "projects": [
@@ -16,11 +17,11 @@
       "name": "Harmony Marketing Hub",
       "description": "An AI-powered FOSS platform for marketing automation and data-driven campaigns. It streamlines omni-channel marketing efforts, making advanced growth tools accessible to startups and SMBs.",
       "webpageUrl": {
-        "url": "https://oracle69.com/harmony-hub"
+        "url": "https://oracle69.com/harmony-hub/funding.json"
       },
       "repositoryUrl": {
-        "url": "https://github.com/Oracle69digitalmarketing/Harmony-Marketing-Hub",
-        "wellKnown": "https://github.com/Oracle69digitalmarketing/Harmony-Marketing-Hub/blob/main/.well-known/funding-manifest-urls"
+        "url": "https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub",
+        "wellKnown": "https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub/blob/main/.well-known/funding-manifest-urls"
       },
       "licenses": [
         "spdx:MIT",
@@ -39,7 +40,7 @@
       {
         "guid": "open-collective",
         "type": "payment-provider",
-        "address": "https://opencollective.com/oracle69-projects",
+        "address": "https://opencollective.com/Harmony_Marketing_Hub",
         "description": "Support our collection of FOSS projects through our Open Collective page. All funds are publicly accounted for and directly support project growth and maintenance."
       }
     ],
