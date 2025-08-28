@@ -1,0 +1,76 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Prince Adewumi Adewale",
+    "email": "adewaleadewumi@oracle69.com",
+    "description": "A digital strategist and developer focused on building intelligent, scalable solutions. This work, including Harmony Marketing Hub, is built on FOSS principles.",
+    "webpageUrl": {
+      "url": "https://oracle69.com",
+      "wellKnown": "https://oracle69.com/.well-known/funding-manifest-urls"
+    }
+  },
+  "projects": [
+    {
+      "guid": "harmony-marketing-hub",
+      "name": "Harmony Marketing Hub",
+      "description": "An AI-powered FOSS platform for marketing automation and data-driven campaigns. It streamlines omni-channel marketing efforts, making advanced growth tools accessible to startups and SMBs.",
+      "webpageUrl": {
+        "url": "https://oracle69.com/harmony-hub",
+        "wellKnown": "https://oracle69.com/.well-known/funding-manifest-urls"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/Oracle69digitalmarketing/Harmony-Marketing-Hub",
+        "wellKnown": "https://oracle69.com/.well-known/funding-manifest-urls"
+      },
+      "licenses": [
+        "spdx:MIT",
+        "spdx:Apache-2.0"
+      ],
+      "tags": [
+        "marketing-automation",
+        "ai",
+        "saas",
+        "data-analytics"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "open-collective",
+        "type": "payment-provider",
+        "address": "https://opencollective.com/oracle69-projects",
+        "description": "Support our collection of FOSS projects through our Open Collective page. All funds are publicly accounted for and directly support project growth and maintenance."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "harmony-general-support",
+        "status": "active",
+        "name": "General Harmony Support",
+        "description": "A recurring contribution to cover essential operational costs like server hosting and core maintenance specifically for the Harmony Marketing Hub.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": [
+          "open-collective"
+        ]
+      },
+      {
+        "guid": "ai-model-grant",
+        "status": "active",
+        "name": "AI Model Development Grant",
+        "description": "A strategic one-time grant to accelerate development of new AI models for intelligent lead scoring and advanced customer segmentation features.",
+        "amount": 7500,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "open-collective"
+        ]
+      }
+    ],
+    "history": []
+  }
+}
