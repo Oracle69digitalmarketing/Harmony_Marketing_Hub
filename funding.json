@@ -5,7 +5,7 @@
     "role": "maintainer",
     "name": "Prince Adewumi Adewale",
     "email": "adewaleadewumi@oracle69.com",
-    "description": "A digital strategist and developer focused on building intelligent, scalable solutions. This work, including Harmony Marketing Hub, is built on FOSS principles.",
+    "description": "A digital strategist and developer building scalable, intelligent solutions that merge technology and business strategy. All work, including Harmony Marketing Hub, is built on FOSS principles.",
     "webpageUrl": {
       "url": "https://oracle69.com",
       "wellKnown": "https://oracle69.com/.well-known/funding-manifest-urls"
@@ -15,7 +15,7 @@
     {
       "guid": "harmony-marketing-hub",
       "name": "Harmony Marketing Hub",
-      "description": "An AI-powered FOSS platform for marketing automation and data-driven campaigns. It streamlines omni-channel marketing efforts, making advanced growth tools accessible to startups and SMBs.",
+      "description": "An AI-powered FOSS platform for marketing automation and data-driven campaigns. It streamlines omni-channel marketing, making advanced growth tools accessible to startups and SMBs.",
       "webpageUrl": {
         "url": "https://oracle69.com/harmony-hub",
         "wellKnown": "https://oracle69.com/.well-known/funding-manifest-urls"
@@ -32,7 +32,8 @@
         "marketing-automation",
         "ai",
         "saas",
-        "data-analytics"
+        "data-analytics",
+        "business-tools"
       ]
     }
   ],
@@ -50,7 +51,7 @@
         "guid": "harmony-general-support",
         "status": "active",
         "name": "General Harmony Support",
-        "description": "A recurring contribution to cover essential operational costs like server hosting and core maintenance specifically for the Harmony Marketing Hub.",
+        "description": "A recurring contribution to cover essential operational costs like server hosting and core maintenance for the Harmony Marketing Hub.",
         "amount": 0,
         "currency": "USD",
         "frequency": "monthly",
@@ -62,7 +63,7 @@
         "guid": "ai-model-grant",
         "status": "active",
         "name": "AI Model Development Grant",
-        "description": "A strategic one-time grant to accelerate development of new AI models for intelligent lead scoring and advanced customer segmentation features.",
+        "description": "A one-time grant to accelerate the development of new AI models for intelligent lead scoring and advanced customer segmentation.",
         "amount": 7500,
         "currency": "USD",
         "frequency": "one-time",
