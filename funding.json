@@ -16,12 +16,11 @@
       "name": "Harmony Marketing Hub",
       "description": "An AI-powered FOSS platform for marketing automation and data-driven campaigns. It streamlines omni-channel marketing efforts, making advanced growth tools accessible to startups and SMBs.",
       "webpageUrl": {
-        "url": "https://oracle69.com/harmony-hub",
-        "wellKnown": "https://oracle69.com/harmony-hub/.well-known/funding.json"
+        "url": "https://oracle69.com/harmony-hub"
       },
       "repositoryUrl": {
         "url": "https://github.com/Oracle69digitalmarketing/Harmony-Marketing-Hub",
-        "wellKnown": "https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub/blob/main/.well-known%2Ffunding-manifest-urls"
+        "wellKnown": "https://github.com/Oracle69digitalmarketing/Harmony-Marketing-Hub/blob/main/.well-known/funding-manifest-urls"
       },
       "licenses": [
         "spdx:MIT",
@@ -73,4 +72,3 @@
     "history": []
   }
 }
-
