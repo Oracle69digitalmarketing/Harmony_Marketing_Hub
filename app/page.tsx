@@ -17,7 +17,6 @@ import {
   CheckCircle,
   BarChart3,
 } from "lucide-react"
-import { FileUploader } from "@/components/ui/file-uploader"
 
 const metrics = [
   {
@@ -126,19 +125,6 @@ export default function Dashboard() {
                 AI Recommendations
               </Button>
             </div>
-
-            {/* Input Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Start Here: Upload Your Data</CardTitle>
-                <CardDescription>
-                  Upload marketing materials, business plans, or competitor analysis to fuel the AI.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUploader />
-              </CardContent>
-            </Card>
 
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
