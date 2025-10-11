@@ -26,9 +26,8 @@ async function uploadFileToS3(file: Buffer, fileName: string) {
     console.log("File uploaded successfully:", fileId);
     return fileId;
   } catch (error) {
-    console.error("Error uploading file to S3:", error);
-    // We re-throw the error to be caught by the main handler
-    throw new Error("Failed to upload file to S3.");
+    console.error("Error uploading file:", error);
+    throw error;
   }
 }
 
@@ -39,38 +38,22 @@ export async function POST(request: Request) {
     const text = formData.get("text") as string | null;
 
     if (!file && !text) {
-      return NextResponse.json({ error: "No file or text was provided." }, { status: 400 });
+      return NextResponse.json({ error: "No file uploaded or text provided." }, { status: 400 });
     }
 
     let fileId: string | null = null;
 
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        return NextResponse.json({ error: "File size exceeds the 10MB limit." }, { status: 413 });
-      }
       const buffer = Buffer.from(await file.arrayBuffer());
       fileId = await uploadFileToS3(buffer, file.name);
     } else if (text) {
-      if (text.length > 5000) { // 5000 character limit
-        return NextResponse.json({ error: "Text input exceeds the 5000 character limit." }, { status: 413 });
-      }
+      // If there's only text, create a file from it and upload to S3
       const buffer = Buffer.from(text, "utf-8");
       fileId = await uploadFileToS3(buffer, "text-input.txt");
     }
 
     return NextResponse.json({ success: true, fileId });
   } catch (error) {
-    let errorMessage = "An unknown error occurred while handling the request.";
-    let statusCode = 500;
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      if (error.message.includes("S3")) {
-        statusCode = 502; // Bad Gateway, indicating an issue with an upstream service
-      }
-    }
-
-    console.error("API Error:", errorMessage);
-    return NextResponse.json({ error: errorMessage }, { status: statusCode });
+    return NextResponse.json({ error: "Error handling the request." }, { status: 500 });
   }
 }
