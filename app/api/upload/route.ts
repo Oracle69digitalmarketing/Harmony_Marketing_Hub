@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
+// Configure the S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -9,51 +11,53 @@ const s3Client = new S3Client({
   },
 });
 
-async function uploadFileToS3(file: Buffer, fileName: string) {
-  const fileBuffer = file;
-  const fileId = `${Date.now()}-${fileName}`;
-
-  const params = {
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileId,
-    Body: fileBuffer,
-    ContentType: "application/octet-stream",
-  };
-
-  const command = new PutObjectCommand(params);
-  try {
-    await s3Client.send(command);
-    console.log("File uploaded successfully:", fileId);
-    return fileId;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
-  }
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const text = formData.get("text") as string | null;
-
-    if (!file && !text) {
-      return NextResponse.json({ error: "No file uploaded or text provided." }, { status: 400 });
-    }
-
-    let fileId: string | null = null;
+    const fileId = uuidv4();
 
     if (file) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      fileId = await uploadFileToS3(buffer, file.name);
+      const fileExtension = file.name.split(".").pop();
+      const fileName = `${fileId}.${fileExtension}`;
+
+      // Upload the file to S3
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: fileName,
+          Body: buffer,
+          ContentType: file.type,
+        })
+      );
+
+      // In a real application, you would trigger the corresponding
+      // processing (Textract for PDFs, Rekognition for images/videos) here.
+      // For now, we'll just return the file ID.
+      return NextResponse.json({
+        message: "File uploaded successfully",
+        fileId,
+      });
     } else if (text) {
-      // If there's only text, create a file from it and upload to S3
-      const buffer = Buffer.from(text, "utf-8");
-      fileId = await uploadFileToS3(buffer, "text-input.txt");
+      // For text inputs, we can store them directly or trigger a different
+      // kind of processing. For now, we'll just return a success message.
+      return NextResponse.json({
+        message: "Text received",
+        fileId, // You might want a different handling for text IDs
+      });
     }
 
-    return NextResponse.json({ success: true, fileId });
+    return NextResponse.json(
+      { message: "No file or text found" },
+      { status: 400 }
+    );
   } catch (error) {
-    return NextResponse.json({ error: "Error handling the request." }, { status: 500 });
+    console.error("Error handling request:", error);
+    return NextResponse.json(
+      { message: "Error handling request" },
+      { status: 500 }
+    );
   }
 }
