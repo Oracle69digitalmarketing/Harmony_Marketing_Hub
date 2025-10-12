@@ -19,8 +19,8 @@ exports.handler = async (event) => {
           Name: key,
         },
       },
-      MaxLabels: 10,
-      MinConfidence: 75,
+      MaxLabels: parseInt(process.env.REKOGNITION_MAX_LABELS || '10', 10),
+      MinConfidence: parseFloat(process.env.REKOGNITION_MIN_CONFIDENCE || '75'),
     });
     const { Labels } = await rekognitionClient.send(detectLabelsCommand);
 
