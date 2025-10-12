@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
 
     if (file) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const fileExtension = file.name.split(".").pop();
-      const fileName = `${fileId}.${fileExtension}`;
+      const fileExtension = file.name.includes('.') ? file.name.substring(file.name.lastIndexOf('.')) : '';
+      const fileName = `${fileId}${fileExtension}`;
 
       // Upload the file to S3
       await s3Client.send(
