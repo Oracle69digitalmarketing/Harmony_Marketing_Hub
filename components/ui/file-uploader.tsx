@@ -51,19 +51,32 @@ export function FileUploader() {
     }
 
     try {
-      const response = await fetch("/api/upload", {
+      const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
-      if (response.ok) {
-        const { fileId } = await response.json();
+      if (uploadResponse.ok) {
+        const { fileId } = await uploadResponse.json();
         console.log("File uploaded successfully. File ID:", fileId);
-        setUploadSuccess(true);
-        // The redirect logic will be added in a later phase.
-        // For now, we'll just confirm the upload was successful.
-        setFiles([]);
-        setText("");
+
+        // Now, trigger plan generation
+        const planResponse = await fetch("/api/generate-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileId }),
+        });
+
+        if (planResponse.ok) {
+          setUploadSuccess(true);
+          // Store the fileId to enable the "View Plan" button
+          // This is a simplified approach for this example.
+          (window as any).generatedFileId = fileId;
+          setFiles([]);
+          setText("");
+        } else {
+          console.error("Plan generation failed");
+        }
       } else {
         console.error("File upload failed");
       }

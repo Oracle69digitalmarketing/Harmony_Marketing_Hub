@@ -121,10 +121,20 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold text-gray-900">Marketing Harmony Hub</h1>
                 <p className="text-gray-600 mt-1">AI-powered marketing orchestration at your fingertips</p>
               </div>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Brain className="mr-2 h-4 w-4" />
-                AI Recommendations
-              </Button>
+              <div>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Brain className="mr-2 h-4 w-4" />
+                  AI Recommendations
+                </Button>
+                {typeof window !== 'undefined' && (window as any).generatedFileId && (
+                  <Button
+                    onClick={() => (window.location.href = `/plan/${(window as any).generatedFileId}`)}
+                    className="ml-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+                  >
+                    View Generated Plan
+                  </Button>
+                )}
+              </div>
             </div>
 
             {/* Input Section */}

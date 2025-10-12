@@ -1,0 +1,65 @@
+service: harmony-marketing-hub
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:GetItem"
+            - "dynamodb:PutItem"
+            - "s3:GetObject"
+            - "textract:AnalyzeDocument"
+            - "rekognition:DetectLabels"
+            - "bedrock:InvokeModel"
+          Resource: "*"
+
+functions:
+  textractProcessor:
+    handler: lambda/textract/index.handler
+    events:
+      - s3:
+          bucket: ${env:S3_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .pdf
+  rekognitionProcessor:
+    handler: lambda/rekognition/index.handler
+    events:
+      - s3:
+          bucket: ${env:S3_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .png
+            - suffix: .jpg
+            - suffix: .jpeg
+            - suffix: .mp4
+            - suffix: .mov
+
+resources:
+  Resources:
+    ProcessedDataTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${env:DYNAMODB_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: "fileId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "fileId"
+            KeyType: "HASH"
+        BillingMode: "PAY_PER_REQUEST"
+    PlansTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${env:DYNAMODB_PLANS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: "fileId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "fileId"
+            KeyType: "HASH"
+        BillingMode: "PAY_PER_REQUEST"
