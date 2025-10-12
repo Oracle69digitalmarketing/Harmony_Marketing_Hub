@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const text = formData.get("text") as string | null;
     const fileId = uuidv4();
 
-    if (file) {
+    if (file instanceof File) {
       const buffer = Buffer.from(await file.arrayBuffer());
       const fileExtension = file.name.includes('.') ? file.name.substring(file.name.lastIndexOf('.')) : '';
       const fileName = `${fileId}${fileExtension}`;
