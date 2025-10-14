@@ -5,12 +5,14 @@ import { useDropzone } from "react-dropzone"
 import { Upload, FileText, X, Loader2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export function FileUploader() {
   const [files, setFiles] = useState<File[]>([])
   const [text, setText] = useState("")
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles([acceptedFiles[0]]);
@@ -60,8 +62,31 @@ export function FileUploader() {
         const { fileId } = await response.json();
         console.log("File uploaded successfully. File ID:", fileId);
         setUploadSuccess(true);
-        // The redirect logic will be added in a later phase.
-        // For now, we'll just confirm the upload was successful.
+
+        const processPayload: { fileId: string; fileType?: string; text?: string } = { fileId };
+        if (files.length > 0) {
+          processPayload.fileType = files[0].type;
+        } else if (text) {
+          processPayload.text = text;
+        }
+
+        // Trigger the processing API
+        const processResponse = await fetch("/api/process-input", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(processPayload),
+        });
+
+        if (processResponse.ok) {
+          const result = await processResponse.json();
+          console.log("Processing complete:", result);
+          router.push(`/results/${result.resultId}`);
+        } else {
+          console.error("Processing failed");
+        }
+
         setFiles([]);
         setText("");
       } else {

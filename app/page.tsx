@@ -17,95 +17,120 @@ import {
   CheckCircle,
   BarChart3,
 } from "lucide-react"
-import { FileUploader } from "@/components/ui/file-uploader"
-
-const metrics = [
-  {
-    title: "Total Campaign ROI",
-    value: "324%",
-    change: "+12.5%",
-    trend: "up",
-    icon: TrendingUp,
-    color: "text-green-600",
-  },
-  {
-    title: "Active Campaigns",
-    value: "47",
-    change: "+3",
-    trend: "up",
-    icon: Target,
-    color: "text-blue-600",
-  },
-  {
-    title: "Monthly Budget",
-    value: "$125,430",
-    change: "-2.1%",
-    trend: "down",
-    icon: DollarSign,
-    color: "text-purple-600",
-  },
-  {
-    title: "Total Leads",
-    value: "12,847",
-    change: "+18.2%",
-    trend: "up",
-    icon: Users,
-    color: "text-orange-600",
-  },
-]
-
-const campaigns = [
-  {
-    name: "Q1 Product Launch",
-    status: "active",
-    budget: "$45,000",
-    spent: "$32,100",
-    roi: "287%",
-    progress: 71,
-  },
-  {
-    name: "Brand Awareness Campaign",
-    status: "optimizing",
-    budget: "$28,500",
-    spent: "$19,200",
-    roi: "156%",
-    progress: 67,
-  },
-  {
-    name: "Holiday Promotion",
-    status: "paused",
-    budget: "$15,000",
-    spent: "$8,900",
-    roi: "203%",
-    progress: 59,
-  },
-]
-
-const aiInsights = [
-  {
-    type: "opportunity",
-    title: "Budget Reallocation Recommended",
-    description: "AI suggests moving $5,200 from underperforming Facebook ads to Google Ads for 23% ROI increase.",
-    priority: "high",
-    icon: Brain,
-  },
-  {
-    type: "alert",
-    title: "Compliance Check Required",
-    description: "New GDPR requirements detected for EU campaigns. Review needed before next deployment.",
-    priority: "medium",
-    icon: AlertTriangle,
-  },
-  {
-    type: "success",
-    title: "A/B Test Winner Identified",
-    description: "Email variant B shows 34% higher conversion rate. Auto-implementation scheduled.",
-    priority: "low",
-    icon: CheckCircle,
-  },
-]
+import { FileUpload } from "@/components/ui/file-upload"
+import { Textarea } from "@/components/ui/textarea"
+import { useState, useEffect } from "react"
 
 export default function Dashboard() {
+  const [text, setText] = useState("");
+  const [processedData, setProcessedData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [refinementInstruction, setRefinementInstruction] = useState("");
+  const [campaignMetrics, setCampaignMetrics] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<any>(null);
+  const [monitoringResult, setMonitoringResult] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      const response = await fetch('/api/metrics');
+      const data = await response.json();
+      setCampaignMetrics(data);
+    };
+    fetchMetrics();
+  }, []);
+
+  const handleTextSubmit = async () => {
+    if (!text) return;
+
+    setIsLoading(true);
+    try {
+      const processResponse = await fetch('/api/process-input', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      const processData = await processResponse.json();
+      setProcessedData(processData);
+    } catch (error) {
+      console.error('Error during text processing:', error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleApprove = async () => {
+    if (!processedData?.resultId) return;
+    await fetch(`/api/results/${processedData.resultId}/approve`, { method: 'POST' });
+    // You might want to update the UI to reflect the approved status
+  };
+
+  const handleRefine = async () => {
+    if (!processedData?.resultId || !refinementInstruction) return;
+
+    setIsLoading(true);
+    try {
+      const refineResponse = await fetch(`/api/results/${processedData.resultId}/refine`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refinementInstruction }),
+      });
+
+      const refinedData = await refineResponse.json();
+      setProcessedData(refinedData);
+    } catch (error) {
+      console.error('Error during refinement:', error);
+    }
+    setIsLoading(false);
+    setIsEditing(false);
+    setRefinementInstruction("");
+  };
+
+  const handleGetRecommendations = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ metrics: campaignMetrics }),
+      });
+      const data = await response.json();
+      setRecommendations(data.recommendations);
+    } catch (error) {
+      console.error('Error getting recommendations:', error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleRunMonitoringAgent = async () => {
+    if (!processedData?.resultId) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/monitoring-agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ planId: processedData.resultId }),
+      });
+      const data = await response.json();
+      setMonitoringResult(data);
+      if (data.refinedPlan) {
+        setProcessedData(data.refinedPlan);
+      }
+    } catch (error) {
+      console.error('Error running monitoring agent:', error);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -121,10 +146,6 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold text-gray-900">Marketing Harmony Hub</h1>
                 <p className="text-gray-600 mt-1">AI-powered marketing orchestration at your fingertips</p>
               </div>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Brain className="mr-2 h-4 w-4" />
-                AI Recommendations
-              </Button>
             </div>
 
             {/* Input Section */}
@@ -136,139 +157,133 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <FileUploader />
-              </CardContent>
-            </Card>
-
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {metrics.map((metric, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">{metric.title}</CardTitle>
-                    <metric.icon className={`h-4 w-4 ${metric.color}`} />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{metric.value}</div>
-                    <div className="flex items-center text-xs text-gray-600">
-                      {metric.trend === "up" ? (
-                        <TrendingUp className="mr-1 h-3 w-3 text-green-600" />
-                      ) : (
-                        <TrendingDown className="mr-1 h-3 w-3 text-red-600" />
-                      )}
-                      <span className={metric.trend === "up" ? "text-green-600" : "text-red-600"}>{metric.change}</span>
-                      <span className="ml-1">from last month</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Active Campaigns */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Active Campaigns</CardTitle>
-                  <CardDescription>Monitor and optimize your running campaigns</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {campaigns.map((campaign, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium">{campaign.name}</h3>
-                          <Badge
-                            variant={
-                              campaign.status === "active"
-                                ? "default"
-                                : campaign.status === "optimizing"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                          >
-                            {campaign.status}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                          <span>Budget: {campaign.budget}</span>
-                          <span>Spent: {campaign.spent}</span>
-                          <span className="text-green-600 font-medium">ROI: {campaign.roi}</span>
-                        </div>
-                        <Progress value={campaign.progress} className="h-2" />
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* AI Insights */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>AI Insights</CardTitle>
-                  <CardDescription>Smart recommendations for optimization</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {aiInsights.map((insight, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
-                      <div
-                        className={`p-2 rounded-full ${
-                          insight.type === "opportunity"
-                            ? "bg-blue-100"
-                            : insight.type === "alert"
-                              ? "bg-yellow-100"
-                              : "bg-green-100"
-                        }`}
-                      >
-                        <insight.icon
-                          className={`h-4 w-4 ${
-                            insight.type === "opportunity"
-                              ? "text-blue-600"
-                              : insight.type === "alert"
-                                ? "text-yellow-600"
-                                : "text-green-600"
-                          }`}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{insight.title}</h4>
-                        <p className="text-xs text-gray-600 mt-1">{insight.description}</p>
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          {insight.priority} priority
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common tasks and shortcuts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button variant="outline" className="h-20 flex flex-col space-y-2">
-                    <Target className="h-6 w-6" />
-                    <span className="text-sm">New Campaign</span>
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col space-y-2">
-                    <BarChart3 className="h-6 w-6" />
-                    <span className="text-sm">View Analytics</span>
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col space-y-2">
-                    <Brain className="h-6 w-6" />
-                    <span className="text-sm">AI Scenarios</span>
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col space-y-2">
-                    <DollarSign className="h-6 w-6" />
-                    <span className="text-sm">Budget Optimizer</span>
+                <FileUpload />
+                <div className="mt-4">
+                  <h3 className="text-lg font-bold mb-2">Or enter text directly</h3>
+                  <Textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Enter your business idea or marketing copy here..."
+                    className="mb-2"
+                  />
+                  <Button onClick={handleTextSubmit} disabled={isLoading}>
+                    {isLoading ? "Processing..." : "Process Text"}
                   </Button>
                 </div>
+                {processedData && (
+                  <div className="mt-4 p-4 border rounded-lg bg-gray-50 w-full">
+                    <h3 className="text-lg font-bold">Generated Business Plan</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold">Executive Summary</h4>
+                        <p>{processedData.aiResponse.executiveSummary}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Industry</h4>
+                        <p>{processedData.aiResponse.industry}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Target Audience</h4>
+                        <p>{processedData.aiResponse.targetAudience}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Value Proposition</h4>
+                        <p>{processedData.aiResponse.valueProposition}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Marketing Channels</h4>
+                        <ul className="list-disc list-inside">
+                          {processedData.aiResponse.marketingChannels.map((channel: string, index: number) => (
+                            <li key={index}>{channel}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">KPIs</h4>
+                        <ul className="list-disc list-inside">
+                          {processedData.aiResponse.kpis.map((kpi: string, index: number) => (
+                            <li key={index}>{kpi}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex space-x-2">
+                      <Button onClick={handleApprove}>Approve</Button>
+                      <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
+                        {isEditing ? "Cancel" : "Edit"}
+                      </Button>
+                    </div>
+                    {isEditing && (
+                      <div className="mt-4">
+                        <Textarea
+                          value={refinementInstruction}
+                          onChange={(e) => setRefinementInstruction(e.target.value)}
+                          placeholder="Enter instructions to refine the plan..."
+                          className="mb-2"
+                        />
+                        <Button onClick={handleRefine} disabled={isLoading}>
+                          {isLoading ? "Refining..." : "Submit Refinement"}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Campaign Performance */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Campaign Performance</CardTitle>
+                <CardDescription>Overview of your simulated campaign metrics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {campaignMetrics.map((metric, index) => (
+                    <Card key={index}>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-600">{metric.channel}</CardTitle>
+                        <DollarSign className="h-4 w-4 text-gray-500" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">${metric.cost.toFixed(2)}</div>
+                        <p className="text-xs text-gray-500">
+                          {metric.impressions} impressions, {metric.clicks} clicks, {metric.conversions} conversions
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <div className="mt-4 flex space-x-2">
+                  <Button onClick={handleGetRecommendations} disabled={isLoading}>
+                    {isLoading ? "Generating..." : "Get AI Recommendations"}
+                  </Button>
+                  <Button onClick={handleRunMonitoringAgent} disabled={!processedData || isLoading}>
+                    {isLoading ? "Running..." : "Run Monitoring Agent"}
+                  </Button>
+                </div>
+                {recommendations && (
+                  <div className="mt-4 p-4 border rounded-lg bg-gray-50 w-full">
+                    <h3 className="text-lg font-bold">AI Recommendations</h3>
+                    <ul className="list-disc list-inside">
+                      {recommendations.map((rec: string, index: number) => (
+                        <li key={index}>{rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {monitoringResult && (
+                  <div className="mt-4 p-4 border rounded-lg bg-gray-50 w-full">
+                    <h3 className="text-lg font-bold">Monitoring Agent Result</h3>
+                    <p>{monitoringResult.message}</p>
+                    {monitoringResult.analysis && (
+                      <pre className="whitespace-pre-wrap mt-2">{JSON.stringify(monitoringResult.analysis, null, 2)}</pre>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
           </div>
         </main>
       </div>

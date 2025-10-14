@@ -19,6 +19,24 @@ export async function POST(request: NextRequest) {
     const fileId = uuidv4();
 
     if (file) {
+      // Validate file type
+      const allowedTypes = ["image/jpeg", "image/png", "application/pdf", "video/mp4", "video/mov"];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json(
+          { message: "Invalid file type" },
+          { status: 400 }
+        );
+      }
+
+      // Validate file size (e.g., 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        return NextResponse.json(
+          { message: "File size exceeds the limit of 10MB" },
+          { status: 400 }
+        );
+      }
+
       const buffer = Buffer.from(await file.arrayBuffer());
       const fileExtension = file.name.split(".").pop();
       const fileName = `${fileId}.${fileExtension}`;
