@@ -1,0 +1,111 @@
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const REGION = process.env.REGION || "eu-north-1";
+const TABLE_NAME = process.env.DYNAMO_CAMPAIGNS || "HarmonyCampaigns";
+
+const dynamo = new DynamoDBClient({ region: REGION });
+const s3 = new S3Client({ region: REGION });
+
+export const handler = async (event) => {
+  console.log("📥 Incoming S3 Event:", JSON.stringify(event, null, 2));
+
+  for (const record of event.Records) {
+    const bucket = record.s3.bucket.name;
+    const key = record.s3.object.key;
+
+    // Log details
+    console.log(`Processing: ${bucket}/${key}`);
+
+    // Get file (optional: use content for AI processing later)
+    const params = { Bucket: bucket, Key: key };
+    const file = await s3.send(new GetObjectCommand(params));
+
+    // Store reference metadata in DynamoDB
+    const item = {
+      CampaignID: { S: key.split(".")[0] },
+      CreatedAt: { S: new Date().toISOString() },
+      FileName: { S: key },
+      Bucket: { S: bucket },
+      Status: { S: "Uploaded" },
+    };
+
+    await dynamo.send(new PutItemCommand({
+      TableName: TABLE_NAME,
+      Item: item,
+    }));
+
+    console.log(`✅ Stored ${key} in DynamoDB table ${TABLE_NAME}`);
+  }
+
+  return { statusCode: 200, body: JSON.stringify({ message: "Success" }) };
+};
+exports.handler = async (event) => {
+  console.log("🤖 AI Orchestration Triggered:", event);
+  return { statusCode: 200, body: "AI orchestration complete" };
+};
+exports.handler = async () => {
+  console.log("📊 Generating campaign report...");
+  return { statusCode: 200, body: "Report generated successfully" };
+};
+exports.handler = async (event) => {
+  console.log("🚀 Campaign trigger event:", event);
+  return { statusCode: 200, body: "Campaign triggered" };
+};
+export function executeAutomationFlow(data) {
+  console.log("⚙️ Executing automation flow:", data);
+}
+export async function invokeAIAgent(prompt) {
+  console.log("🧠 AI Agent Prompt:", prompt);
+  return "AI response placeholder";
+}
+export const buildPrompt = (context) => {
+  return \`Generate marketing copy based on: \${context}\`;
+};
+// 🧩 API Gateway Entrypoint
+import express from "express";
+import campaigns from "./routes/campaigns.js";
+import analytics from "./routes/analytics.js";
+import automation from "./routes/automation.js";
+
+const app = express();
+app.use(express.json());
+
+app.use("/campaigns", campaigns);
+app.use("/analytics", analytics);
+app.use("/automation", automation);
+
+export const handler = async (event) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Harmony API Gateway Active" }),
+  };
+};
+import express from "express";
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.json({ campaigns: "Fetch campaigns" });
+});
+
+router.post("/launch", (req, res) => {
+  res.json({ status: "Campaign launched" });
+});
+
+export default router;
+import express from "express";
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.json({ analytics: "Real-time campaign analytics" });
+});
+
+export default router;
+import express from "express";
+const router = express.Router();
+
+router.post("/trigger", (req, res) => {
+  res.json({ automation: "Automation trigger received" });
+});
+
+export default router;
