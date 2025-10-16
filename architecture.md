@@ -17,33 +17,48 @@ graph TD
     subgraph API["API Layer (Next.js API Routes)"]
         B[/api/upload/]
         C[/api/process-input/]
-        D[/api/results/{id}/]
-        E[/api/results/{id}/approve/]
-        F[/api/results/{id}/refine/]
+        D[/api/results/:id/]
+        E[/api/results/:id/approve/]
+        F[/api/results/:id/refine/]
         G[/api/metrics/]
         H[/api/recommendations/]
         I[/api/monitoring-agent/]
     end
 
     subgraph AWS["AWS Services"]
-        J[S3 Bucket]
-        K[DynamoDB Tables]
-        L[Amazon Bedrock]
-        M[Amazon Textract]
-        N[Amazon Rekognition]
-        O[Lambda - Campaign Manager]
+        J[(Amazon S3)]
+        K[(Amazon DynamoDB)]
+        L[(Amazon Bedrock)]
+        M[(Amazon Textract)]
+        N[(Amazon Rekognition)]
+        O[(AWS Lambda - Campaign Manager)]
     end
 
-    A --> B & C & D & E & F & G & H & I
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    A --> G
+    A --> H
+    A --> I
+
     B --> J
-    C --> J & M & N & L & K
+    C --> J
+    C --> M
+    C --> N
+    C --> L
+    C --> K
+
     D --> K
-    E --> K & O
-    F --> K & L
+    E --> O
+    F --> L
     G --> K
     H --> L
-    I --> K & L & F
-    O --> J & K
+    I --> F
+
+    O --> J
+    O --> K
 ```
 
 ## Components
