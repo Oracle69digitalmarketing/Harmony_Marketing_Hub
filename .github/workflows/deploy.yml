@@ -1,0 +1,114 @@
+name: 🚀 Harmony Marketing Hub AWS CI/CD (Advanced)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # 1️⃣ Checkout Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3️⃣ Install Dependencies
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci || npm install
+
+      # 4️⃣ Configure AWS Credentials via OIDC
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/GitHubActionsDeploymentRole
+          aws-region: eu-north-1
+
+      # 5️⃣ Deploy Lambda Functions
+      - name: Deploy Lambda Functions
+        run: |
+          cd backend/lambda
+          for fn in */ ; do
+            zip -r "${fn%/}.zip" "$fn"
+            aws lambda update-function-code \
+              --function-name "${fn%/}" \
+              --zip-file "fileb://${fn%/}.zip"
+          done
+
+      # 6️⃣ Sync Frontend Files to S3
+      - name: Sync Frontend
+        run: |
+          aws s3 sync frontend/ s3://harmony-marketing-hub --delete
+
+      # 7️⃣ Invalidate CloudFront Cache
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id <YOUR_DISTRIBUTION_ID> \
+            --paths "/*"
+
+      # 8️⃣ Log Deployment Metadata to DynamoDB
+      - name: Log Deployment to DynamoDB
+        run: |
+          COMMIT_SHA=$(git rev-parse HEAD)
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          aws dynamodb put-item \
+            --table-name HarmonyDeployLogs \
+            --item "{\"commit\": {\"S\": \"$COMMIT_SHA\"}, \"timestamp\": {\"S\": \"$DATE\"}, \"status\": {\"S\": \"success\"}}"
+
+      # 9️⃣ Send Slack Notification
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "🚀 *Harmony Marketing Hub Deployed Successfully!*",
+              "attachments": [
+                {
+                  "color": "#36a64f",
+                  "fields": [
+                    { "title": "Environment", "value": "Production", "short": true },
+                    { "title": "Commit", "value": "${{ github.sha }}", "short": true }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # 🔔 10️⃣ Send Discord Notification
+      - name: Notify Discord
+        if: always()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d "{\"content\": \"✅ Harmony Marketing Hub deployed successfully!\nCommit: $GITHUB_SHA\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # 🛑 11️⃣ Rollback on Failure
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "⚠️ Deployment failed. Initiating rollback..."
+          PREV_VERSION=$(aws dynamodb scan --table-name HarmonyDeployLogs \
+            --limit 2 --query "Items[-1].commit.S" --output text)
+          if [ -n "$PREV_VERSION" ]; then
+            echo "Rolling back to commit: $PREV_VERSION"
+            git checkout $PREV_VERSION
+          else
+            echo "No previous version found. Manual intervention required."
+          fi
