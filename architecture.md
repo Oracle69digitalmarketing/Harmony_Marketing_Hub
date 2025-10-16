@@ -10,61 +10,40 @@ The application is a serverless web application built on Next.js and hosted on A
 
 ```mermaid
 graph TD
-    subgraph User Interface
+    subgraph UI["User Interface"]
         A[Next.js Frontend on Amplify/Vercel]
     end
 
-    subgraph API Layer (Next.js API Routes)
-        B[/api/upload]
-        C[/api/process-input]
-        D[/api/results/{id}]
-        E[/api/results/{id}/approve]
-        F[/api/results/{id}/refine]
-        G[/api/metrics]
-        H[/api/recommendations]
-        I[/api/monitoring-agent]
+    subgraph API["API Layer (Next.js API Routes)"]
+        B[/api/upload/]
+        C[/api/process-input/]
+        D[/api/results/{id}/]
+        E[/api/results/{id}/approve/]
+        F[/api/results/{id}/refine/]
+        G[/api/metrics/]
+        H[/api/recommendations/]
+        I[/api/monitoring-agent/]
     end
 
-    subgraph AWS Services
-        J[Amazon S3]
-        K[Amazon DynamoDB]
+    subgraph AWS["AWS Services"]
+        J[S3 Bucket]
+        K[DynamoDB Tables]
         L[Amazon Bedrock]
         M[Amazon Textract]
         N[Amazon Rekognition]
-        O[AWS Lambda]
+        O[Lambda - Campaign Manager]
     end
 
-    A --> B
-    A --> C
-    A --> D
-    A --> E
-    A --> F
-    A --> G
-    A --> H
-    A --> I
-
+    A --> B & C & D & E & F & G & H & I
     B --> J
-    C --> J
-    C --> M
-    C --> N
-    C --> L
-    C --> K
-
+    C --> J & M & N & L & K
     D --> K
-    E --> K
-    E --> O
-
-    F --> K
-    F --> L
-
+    E --> K & O
+    F --> K & L
     G --> K
     H --> L
-    I --> K
-    I --> L
-    I --> F
-
-    O --> J
-    O --> K
+    I --> K & L & F
+    O --> J & K
 ```
 
 ## Components
