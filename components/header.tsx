@@ -29,9 +29,15 @@ export function Header() {
       try {
         const response = await fetch('/api/notifications');
         const data = await response.json();
-        setNotifications(data);
+        // Defensive check to ensure data is an array
+        if (Array.isArray(data)) {
+          setNotifications(data);
+        } else {
+          setNotifications([]); // Default to empty array on error
+        }
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
+        setNotifications([]); // Also default to empty array on fetch error
       }
     };
 
