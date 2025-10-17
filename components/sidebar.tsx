@@ -24,14 +24,14 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
+  { name: "AI Scenario Runner", href: "/scenario-runner", icon: Brain },
   { name: "Campaigns", href: "/campaigns", icon: Target },
-  { name: "AI Scenarios", href: "/scenarios", icon: Brain },
-  { name: "Budget Optimizer", href: "/budget", icon: DollarSign },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "A/B Testing", href: "/ab-testing", icon: FileText },
+  { name: "Social Listening", href: "/social-listening", icon: MessageSquare },
+  { name: "Customer Journey", href: "/customer-journey", icon: Users },
   { name: "Attribution", href: "/attribution", icon: TrendingUp },
-  { name: "A/B Testing", href: "/testing", icon: FileText },
-  { name: "Social Listening", href: "/social", icon: MessageSquare },
-  { name: "Customer Journey", href: "/journey", icon: Users },
+  { name: "Budget Optimizer", href: "/budget", icon: DollarSign },
   { name: "Compliance", href: "/compliance", icon: Shield },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
