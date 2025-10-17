@@ -1,33 +1,34 @@
-// This is a mock API endpoint to supply a list of notifications.
 import { NextRequest, NextResponse } from "next/server";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+
+const dynamoClient = new DynamoDBClient({
+    region: process.env.REGION,
+    credentials: {
+        accessKeyId: process.env.ACCESS_KEY_ID!,
+        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    },
+});
+
+const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 export async function GET(request: NextRequest) {
-  const mockNotifications = [
-    {
-      id: 1,
-      title: "New AI Recommendation",
-      description: "Your campaign 'Summer Sale' has a new optimization suggestion.",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Budget Alert",
-      description: "You have used 80% of your monthly budget.",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "Campaign Ended",
-      description: "Your 'Q2 Promo' campaign has finished.",
-      read: true,
-    },
-    {
-      id: 4,
-      title: "New Insight Available",
-      description: "Audience demographics for 'Social Media' have been updated.",
-      read: true,
-    },
-  ];
+  try {
+    const command = new ScanCommand({
+      TableName: "HarmonyMarketingHub-Notifications",
+    });
 
-  return NextResponse.json(mockNotifications);
+    const { Items } = await docClient.send(command);
+
+    // Sort items by timestamp, newest first. Assumes a 'timestamp' attribute.
+    const sortedItems = Items?.sort((a, b) => b.timestamp - a.timestamp) || [];
+
+    return NextResponse.json(sortedItems);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return NextResponse.json(
+      { message: "Error fetching notifications" },
+      { status: 500 }
+    );
+  }
 }
