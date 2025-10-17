@@ -1,5 +1,6 @@
-"use client"
+'''use client'''
 
+import { useState, useEffect } from "react"
 import { Bell, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,32 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+interface Notification {
+  id: number;
+  title: string;
+  description: string;
+  read: boolean;
+}
+
 export function Header() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/notifications');
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
       <div className="flex items-center space-x-4 flex-1">
@@ -28,32 +54,28 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-80" align="end" forceMount>
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">New AI Recommendation</p>
-                <p className="text-xs text-muted-foreground">Your campaign 'Summer Sale' has a new optimization suggestion.</p>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Budget Alert</p>
-                <p className="text-xs text-muted-foreground">You have used 80% of your monthly budget.</p>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Campaign Ended</p>
-                <p className="text-xs text-muted-foreground">Your 'Q2 Promo' campaign has finished.</p>
-              </div>
-            </DropdownMenuItem>
+            {notifications.length > 0 ? (
+              notifications.map(notification => (
+                <DropdownMenuItem key={notification.id} className={`${!notification.read ? 'font-bold' : ''}`}>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm leading-none">{notification.title}</p>
+                    <p className="text-xs text-muted-foreground">{notification.description}</p>
+                  </div>
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <DropdownMenuItem disabled>No new notifications</DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
