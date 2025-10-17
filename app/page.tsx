@@ -20,6 +20,7 @@ import {
 import { FileUpload } from "@/components/ui/file-upload"
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 export default function Dashboard() {
   const [text, setText] = useState("");
@@ -240,7 +241,8 @@ export default function Dashboard() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {Array.isArray(campaignMetrics) && campaignMetrics.map((metric, index) => (
-                    <Card key={index}>
+                  <Link href={`/campaign/${encodeURIComponent(metric.channel.toLowerCase())}`} key={index}>
+                    <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-gray-600">{metric.channel}</CardTitle>
                         <DollarSign className="h-4 w-4 text-gray-500" />
@@ -252,6 +254,7 @@ export default function Dashboard() {
                         </p>
                       </CardContent>
                     </Card>
+                  </Link>
                   ))}
                 </div>
                 <div className="mt-4 flex space-x-2">
