@@ -1,4 +1,4 @@
-'''use client'''
+"use client";
 
 import { useState, useEffect } from "react"
 import { Bell, Search } from "lucide-react"
