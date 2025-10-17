@@ -6,67 +6,52 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
-import { PlayCircle, CheckCircle, Loader, AlertCircle } from "lucide-react"
+import { Loader } from "lucide-react"
 
-// Define the structure for a log entry
-interface LogEntry {
-  id: number;
-  text: string;
-  status: 'pending' | 'in-progress' | 'done' | 'error';
+// Define the structure for the generated plan
+interface GeneratedPlan {
+  executiveSummary: string;
+  industry: string;
+  targetAudience: string;
+  valueProposition: string;
+  marketingChannels: string[];
+  kpis: string[];
 }
-
-// The list of steps the agent will perform, based on the documentation
-const scenarioSteps = [
-  "Analyzing user input",
-  "Generating business plan & marketing strategy",
-  "Integrating with external services (APIs, CRMs)",
-  "Simulating campaign execution across channels",
-  "Applying Budget Optimizer based on initial results",
-  "Generating final report and analytics dashboard",
-  "Scenario complete."
-];
 
 export default function ScenarioRunnerPage() {
   const [goal, setGoal] = useState("");
-  const [log, setLog] = useState<LogEntry[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
+  const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRunScenario = async () => {
-    setIsRunning(true);
-    // Initialize logs with all steps as pending
-    const initialLog: LogEntry[] = scenarioSteps.map((step, index) => ({
-      id: index,
-      text: step,
-      status: 'pending',
-    }));
-    setLog(initialLog);
+    if (!goal) return;
 
-    // Simulate the agent's workflow with delays
-    for (let i = 0; i < scenarioSteps.length; i++) {
-      // Update current step to 'in-progress'
-      setLog(prevLog => prevLog.map(entry => entry.id === i ? { ...entry, status: 'in-progress' } : entry));
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate work
+    setIsLoading(true);
+    setError(null);
+    setGeneratedPlan(null);
 
-      // Update current step to 'done'
-      setLog(prevLog => prevLog.map(entry => entry.id === i ? { ...entry, status: 'done' } : entry));
+    try {
+      const response = await fetch('/api/run-scenario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ goal }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate business plan. The AI service may be unavailable.');
+      }
+
+      const plan = await response.json();
+      setGeneratedPlan(plan);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsRunning(false);
   };
-
-  const getStatusIcon = (status: LogEntry['status']) => {
-    switch (status) {
-      case 'done':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'in-progress':
-        return <Loader className="h-5 w-5 text-blue-500 animate-spin" />;
-      case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case 'pending':
-      default:
-        return <PlayCircle className="h-5 w-5 text-gray-400" />;
-    }
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -78,7 +63,7 @@ export default function ScenarioRunnerPage() {
             <Card>
               <CardHeader>
                 <CardTitle>AI Scenario Runner</CardTitle>
-                <CardDescription>Define a high-level goal and watch the autonomous agent execute the plan.</CardDescription>
+                <CardDescription>Define a high-level goal and the autonomous agent will generate a complete business and marketing plan.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -88,21 +73,54 @@ export default function ScenarioRunnerPage() {
                     placeholder="e.g., 'Launch a marketing campaign for a new artisanal coffee shop in San Francisco'"
                     className="mb-2"
                   />
-                  <Button onClick={handleRunScenario} disabled={isRunning || !goal}>
-                    {isRunning ? "Scenario in Progress..." : "Run Scenario"}
+                  <Button onClick={handleRunScenario} disabled={isLoading || !goal}>
+                    {isLoading ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Run Scenario"}
                   </Button>
                 </div>
 
-                {log.length > 0 && (
-                  <div className="p-4 border rounded-lg bg-gray-900 text-white font-mono">
-                    <h3 className="text-lg font-semibold mb-2">Live Agent Log</h3>
-                    <div className="space-y-2">
-                      {log.map((entry) => (
-                        <div key={entry.id} className="flex items-center space-x-3">
-                          {getStatusIcon(entry.status)}
-                          <span className={`${entry.status === 'done' ? 'text-gray-400' : ''}`}>{entry.text}</span>
-                        </div>
-                      ))}
+                {error && (
+                  <div className="p-4 border rounded-lg bg-red-50 text-red-700">
+                    <h3 className="text-lg font-semibold mb-2">An Error Occurred</h3>
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                {generatedPlan && (
+                  <div className="p-4 border rounded-lg bg-gray-100 dark:bg-gray-800">
+                    <h3 className="text-xl font-bold mb-4">Generated Business Plan</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-lg">Executive Summary</h4>
+                        <p className="text-muted-foreground">{generatedPlan.executiveSummary}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-lg">Industry</h4>
+                        <p className="text-muted-foreground">{generatedPlan.industry}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-lg">Target Audience</h4>
+                        <p className="text-muted-foreground">{generatedPlan.targetAudience}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-lg">Value Proposition</h4>
+                        <p className="text-muted-foreground">{generatedPlan.valueProposition}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-lg">Marketing Channels</h4>
+                        <ul className="list-disc list-inside text-muted-foreground">
+                          {generatedPlan.marketingChannels.map((channel, index) => (
+                            <li key={index}>{channel}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-lg">Key Performance Indicators (KPIs)</h4>
+                        <ul className="list-disc list-inside text-muted-foreground">
+                          {generatedPlan.kpis.map((kpi, index) => (
+                            <li key={index}>{kpi}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
