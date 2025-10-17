@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
     const generatedPlan = await invokeClaude(prompt);
 
     return NextResponse.json(generatedPlan);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating business plan:", error);
     return NextResponse.json(
-      { message: "Error generating business plan" },
+      { message: "Error generating business plan", error: error.message },
       { status: 500 }
     );
   }
