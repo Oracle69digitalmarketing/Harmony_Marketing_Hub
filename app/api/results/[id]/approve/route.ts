@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { executeCampaign } from "../../../../lambda/campaign-manager";
+import { executeCampaign } from "@/lambda/campaign-manager";
 
 const dynamoClient = new DynamoDBClient({
     region: process.env.AWS_REGION,

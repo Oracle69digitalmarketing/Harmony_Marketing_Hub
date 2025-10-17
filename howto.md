@@ -1,0 +1,237 @@
+# How to Implement Real Campaign Execution in Harmony Marketing Hub
+
+This guide explains how to replace the placeholder `executeCampaign` function in `lambda/campaign-manager.ts` with real implementations to send marketing campaigns through various channels.
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+-   An AWS account with administrator access.
+-   The AWS CLI configured on your local machine.
+-   The Amplify project for Harmony Marketing Hub set up and deployed.
+-   Necessary IAM permissions for SES, and any other AWS services you plan to use.
+
+## 1. Email Campaigns with AWS Simple Email Service (SES)
+
+AWS SES is a cost-effective and scalable email service. Here's how to integrate it into your campaign manager.
+
+### Step 1.1: Verify Your Sender Identity in SES
+
+Before you can send emails, you need to prove that you own the "From" email address.
+
+1.  Go to the **AWS SES console**.
+2.  In the navigation pane, under **Configuration**, choose **Verified identities**.
+3.  Choose **Create identity**.
+4.  Select **Email address** or **Domain**, and follow the on-screen instructions. You will receive a verification email. Click the link in the email to complete the verification.
+
+### Step 1.2: Update the `campaign-manager.ts` for SES
+
+Now, you'll modify the `executeCampaign` function to use the AWS SDK for SES.
+
+First, install the SES client if it's not already in your `package.json`:
+```bash
+pnpm add @aws-sdk/client-ses
+```
+
+Then, update `lambda/campaign-manager.ts` like this:
+
+```typescript
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+
+// ... (keep the MarketingPlan interface)
+
+export const executeCampaign = async (plan: MarketingPlan): Promise<{ success: boolean; message: string }> => {
+  console.log("--- Starting Campaign Execution ---");
+  // ... (keep the initial console logs)
+
+  for (const channel of plan.marketingChannels) {
+    console.log(`Executing campaign on channel: ${channel}`);
+    switch (channel.toLowerCase()) {
+      case "email":
+        console.log("  -> Sending marketing emails via SES...");
+        const sesClient = new SESClient({ region: process.env.AWS_REGION });
+        const emailParams = {
+          Source: "your-verified-email@example.com", // Replace with your verified SES email
+          Destination: {
+            // In a real app, you would get this from your user database
+            ToAddresses: ["customer1@example.com", "customer2@example.com"],
+          },
+          Message: {
+            Subject: { Data: plan.executiveSummary || "A Special Offer" },
+            Body: {
+              Text: { Data: plan.valueProposition || "Check out our new product!" },
+            },
+          },
+        };
+        try {
+          await sesClient.send(new SendEmailCommand(emailParams));
+          console.log("    -> Email sent successfully via SES.");
+        } catch (error) {
+          console.error("    -> Error sending email:", error);
+        }
+        break;
+      // ... (other cases)
+    }
+  }
+  // ... (keep the final console logs and return statement)
+};
+```
+
+**Note on Credentials:** The code uses `process.env.AWS_REGION`. Amplify automatically makes the region available as an environment variable in the build environment. The AWS SDK will automatically use the IAM role associated with the Lambda function, so you don't need to manage access keys and secret keys manually.
+
+## 2. WhatsApp Campaigns with Twilio (External API)
+
+AWS does not have a native service for sending WhatsApp messages. For this, you'll need to use a third-party service like **Twilio**.
+
+### Step 2.1: Set up a Twilio Account
+
+1.  Go to the [Twilio website](https://www.twilio.com/) and sign up for a free trial account.
+2.  Follow their instructions to get a Twilio phone number and your **Account SID** and **Auth Token**.
+3.  Configure the Twilio Sandbox for WhatsApp to test your integration.
+
+### Step 2.2: Store Twilio Credentials Securely
+
+**Do not hardcode your credentials!** Use Amplify's environment variables to store them securely.
+
+1.  In your Amplify project, run the following commands:
+    ```bash
+    amplify add function # Choose "Lambda function" and give it a name like "secrets"
+    ```
+2.  When prompted, choose to store secrets. Add your Twilio credentials:
+    -   `TWILIO_ACCOUNT_SID`
+    -   `TWILIO_AUTH_TOKEN`
+    -   `TWILIO_PHONE_NUMBER`
+3.  Amplify will store these in AWS Secrets Manager and make them available as environment variables to your Lambda functions.
+
+Alternatively, you can add them directly as environment variables in the Amplify Console under **Environment variables**.
+
+### Step 2.3: Update the `campaign-manager.ts` for Twilio
+
+First, install the Twilio SDK:
+```bash
+pnpm add twilio
+```
+
+Then, update the `whatsapp` case in `lambda/campaign-manager.ts`:
+
+```typescript
+import { Twilio } from "twilio";
+
+// ... (inside the executeCampaign function)
+
+      case "whatsapp":
+        console.log("  -> Sending WhatsApp messages via Twilio...");
+        const accountSid = process.env.TWILIO_ACCOUNT_SID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
+        const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+        const client = new Twilio(accountSid, authToken);
+
+        try {
+          await client.messages.create({
+            body: plan.valueProposition || "Check out our new product!",
+            from: `whatsapp:${twilioPhoneNumber}`,
+            to: "whatsapp:+1234567890", // Replace with a real phone number
+          });
+          console.log("    -> WhatsApp message sent successfully via Twilio.");
+        } catch (error) {
+          console.error("    -> Error sending WhatsApp message:", error);
+        }
+        break;
+```
+
+## 3. Social Media Campaigns
+
+Integrating with social media platforms like Twitter, Facebook, or LinkedIn follows a similar pattern to the Twilio integration:
+
+1.  **Create a Developer Account:** Sign up for a developer account on the platform you want to use.
+2.  **Get API Keys:** Create an app and get your API keys and access tokens.
+3.  **Store Credentials Securely:** Use Amplify environment variables or AWS Secrets Manager.
+4.  **Use the Official SDK:** Install the official SDK for the platform (e.g., `twitter-api-v2` for Twitter) and use it in your `executeCampaign` function.
+
+## Final Code Example
+
+Here's what your `lambda/campaign-manager.ts` might look like with the SES and Twilio examples integrated:
+
+```typescript
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { Twilio } from "twilio";
+
+interface MarketingPlan {
+  executiveSummary: string;
+  industry: string;
+  targetAudience: string;
+  valueProposition: string;
+  marketingChannels: string[];
+  kpis: string[];
+}
+
+export const executeCampaign = async (plan: MarketingPlan): Promise<{ success: boolean; message: string }> => {
+  console.log("--- Starting Campaign Execution ---");
+  console.log(`Campaign for: ${plan.executiveSummary}`);
+  console.log(`Target Audience: ${plan.targetAudience}`);
+
+  if (!plan.marketingChannels || plan.marketingChannels.length === 0) {
+    console.warn("No marketing channels specified in the plan.");
+    return { success: false, message: "No marketing channels to execute." };
+  }
+
+  for (const channel of plan.marketingChannels) {
+    console.log(`Executing campaign on channel: ${channel}`);
+    switch (channel.toLowerCase()) {
+      case "email":
+        console.log("  -> Sending marketing emails via SES...");
+        const sesClient = new SESClient({ region: process.env.AWS_REGION });
+        const emailParams = {
+          Source: "your-verified-email@example.com",
+          Destination: {
+            ToAddresses: ["customer1@example.com"],
+          },
+          Message: {
+            Subject: { Data: plan.executiveSummary || "A Special Offer" },
+            Body: {
+              Text: { Data: plan.valueProposition || "Check out our new product!" },
+            },
+          },
+        };
+        try {
+          await sesClient.send(new SendEmailCommand(emailParams));
+          console.log("    -> Email sent successfully via SES.");
+        } catch (error) {
+          console.error("    -> Error sending email:", error);
+        }
+        break;
+
+      case "whatsapp":
+        console.log("  -> Sending WhatsApp messages via Twilio...");
+        const accountSid = process.env.TWILIO_ACCOUNT_SID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
+        const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+        const client = new Twilio(accountSid, authToken);
+
+        try {
+          await client.messages.create({
+            body: plan.valueProposition || "Check out our new product!",
+            from: `whatsapp:${twilioPhoneNumber}`,
+            to: "whatsapp:+1234567890",
+          });
+          console.log("    -> WhatsApp message sent successfully via Twilio.");
+        } catch (error) {
+          console.error("    -> Error sending WhatsApp message:", error);
+        }
+        break;
+
+      case "social media":
+        console.log("  -> Posting on social media (not implemented)...");
+        // Add your social media integration here
+        break;
+
+      default:
+        console.log(`  -> Unknown channel: ${channel}`);
+        break;
+    }
+  }
+
+  console.log("--- Campaign Execution Finished ---");
+  return { success: true, message: "Campaign execution simulated successfully." };
+};
+```

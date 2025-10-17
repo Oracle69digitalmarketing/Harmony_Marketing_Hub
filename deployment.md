@@ -41,7 +41,6 @@ This is a critical step. You need to provide the application with the necessary 
     *   `AWS_ACCESS_KEY_ID`: The access key for an IAM user with the necessary permissions.
     *   `AWS_SECRET_ACCESS_KEY`: The secret access key for the IAM user.
     *   `S3_BUCKET_NAME`: The name of the S3 bucket you will use for file uploads.
-    *   `NEXT_PUBLIC_API_URL`: The URL of your deployed application (Amplify will provide this after the first deployment, so you might need to update it later).
 
 **Security Note:** It is highly recommended to use an IAM role with the minimum required permissions instead of creating a user with long-lived credentials. You can configure this in the "Service role" section in Amplify.
 
