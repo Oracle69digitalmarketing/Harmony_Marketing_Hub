@@ -40,8 +40,10 @@ export default function ScenarioRunnerPage() {
         body: JSON.stringify({ goal }),
       });
 
+      // Correctly handle HTTP errors
       if (!response.ok) {
-        throw new Error('Failed to generate business plan. The AI service may be unavailable.');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'An unknown error occurred while processing the request.');
       }
 
       const plan = await response.json();

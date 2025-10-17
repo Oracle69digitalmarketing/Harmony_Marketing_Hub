@@ -59,8 +59,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(generatedPlan);
   } catch (error: any) {
     console.error("Error generating business plan:", error);
+    // Return the specific error message from the AWS SDK
     return NextResponse.json(
-      { message: "Error generating business plan", error: error.message },
+      { message: `An error occurred while communicating with the AI service: ${error.message}` },
       { status: 500 }
     );
   }
