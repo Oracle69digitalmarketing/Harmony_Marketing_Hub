@@ -12,6 +12,8 @@ import { Header } from "@/components/header"
 import { Plus, Search, Filter, MoreHorizontal, Play, Pause, Edit } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+
 const campaigns = [
   {
     id: 1,
@@ -78,6 +80,7 @@ const campaigns = [
 export default function CampaignsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const filteredCampaigns = campaigns.filter(
     (campaign) =>
@@ -113,10 +116,31 @@ export default function CampaignsPage() {
                 <h1 className="text-3xl font-bold text-gray-900">Campaign Management</h1>
                 <p className="text-gray-600 mt-1">Monitor, optimize, and scale your marketing campaigns</p>
               </div>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="mr-2 h-4 w-4" />
-                New Campaign
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Campaign
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Campaign</DialogTitle>
+                    <DialogDescription>
+                      Enter the name for your new campaign to get started.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="name" className="text-right">Name</label>
+                      <Input id="name" placeholder="e.g., Q3 Product Launch" className="col-span-3" />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" onClick={() => setIsDialogOpen(false)}>Create Campaign</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Search and Filters */}
