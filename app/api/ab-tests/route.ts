@@ -25,13 +25,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(Items || []);
   } catch (error) {
     console.error("Error fetching A/B tests:", error);
-    // If the table doesn't exist, return an empty array to prevent frontend errors.
-    if (error.name === 'ResourceNotFoundException') {
-        return NextResponse.json([]);
-    }
-    return NextResponse.json(
-      { message: "Error fetching A/B tests" },
-      { status: 500 }
-    );
+    // If any error occurs, return an empty array to prevent frontend errors.
+    return NextResponse.json([]);
   }
 }
