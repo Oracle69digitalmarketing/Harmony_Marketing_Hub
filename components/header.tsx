@@ -24,12 +24,38 @@ export function Header() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="sm" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+                3
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-80" align="end" forceMount>
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">New AI Recommendation</p>
+                <p className="text-xs text-muted-foreground">Your campaign 'Summer Sale' has a new optimization suggestion.</p>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">Budget Alert</p>
+                <p className="text-xs text-muted-foreground">You have used 80% of your monthly budget.</p>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">Campaign Ended</p>
+                <p className="text-xs text-muted-foreground">Your 'Q2 Promo' campaign has finished.</p>
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
