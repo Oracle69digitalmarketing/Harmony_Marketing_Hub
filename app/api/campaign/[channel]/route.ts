@@ -1,6 +1,16 @@
-// This is a mock API endpoint to supply detailed campaign data.
-// In a real application, this would fetch data from a database.
 import { NextRequest, NextResponse } from "next/server";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+
+const dynamoClient = new DynamoDBClient({
+    region: process.env.REGION,
+    credentials: {
+        accessKeyId: process.env.ACCESS_KEY_ID!,
+        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    },
+});
+
+const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 // Function to generate mock time-series data for a chart
 const generateChartData = () => {
@@ -18,26 +28,51 @@ const generateChartData = () => {
 };
 
 export async function GET(request: NextRequest, { params }: { params: { channel: string } }) {
-  const channel = decodeURIComponent(params.channel);
+  const channelName = decodeURIComponent(params.channel);
 
-  // Generate mock data based on the channel name
-  const mockData = {
-    channel: channel.replace(/\b\w/g, l => l.toUpperCase()),
-    summary: {
-      totalClicks: Math.floor(Math.random() * 5000) + 1000,
-      totalImpressions: Math.floor(Math.random() * 50000) + 10000,
-      clickThroughRate: (Math.random() * 5 + 1).toFixed(2),
-      conversionRate: (Math.random() * 2 + 0.5).toFixed(2),
-      costPerClick: (Math.random() * 2 + 0.5).toFixed(2),
-      totalCost: (Math.random() * 10000 + 2000).toFixed(2),
-    },
-    chartData: generateChartData(),
-    demographics: {
-      topAgeRange: '25-34',
-      topGender: 'Female',
-      topLocation: 'California, USA',
-    },
-  };
+  try {
+    const command = new QueryCommand({
+      TableName: "HarmonyMarketingHub-CampaignMetrics",
+      KeyConditionExpression: "channel = :channel",
+      ExpressionAttributeValues: {
+        ":channel": channelName,
+      },
+    });
 
-  return NextResponse.json(mockData);
+    const { Items } = await docClient.send(command);
+
+    if (!Items || Items.length === 0) {
+      return NextResponse.json({ message: `Campaign '${channelName}' not found` }, { status: 404 });
+    }
+
+    const campaign = Items[0];
+
+    // Construct the response, combining real DB data with simulated chart data
+    const responseData = {
+      channel: campaign.channel,
+      summary: {
+        totalClicks: campaign.clicks,
+        totalImpressions: campaign.impressions,
+        clickThroughRate: ((campaign.clicks / campaign.impressions) * 100).toFixed(2),
+        conversionRate: campaign.conversions,
+        costPerClick: (campaign.cost / campaign.clicks).toFixed(2),
+        totalCost: campaign.cost.toFixed(2),
+      },
+      chartData: generateChartData(), // Chart data remains simulated
+      demographics: {
+        topAgeRange: campaign.topAgeRange || '25-34', // Fallback if not in DB
+        topGender: campaign.topGender || 'Female',
+        topLocation: campaign.topLocation || 'California, USA',
+      },
+    };
+
+    return NextResponse.json(responseData);
+
+  } catch (error) {
+    console.error(`Error fetching data for campaign '${channelName}':`, error);
+    return NextResponse.json(
+      { message: `Error fetching data for campaign '${channelName}'` },
+      { status: 500 }
+    );
+  }
 }
