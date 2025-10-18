@@ -8,42 +8,42 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 
 const s3Client = new S3Client({
-  region: process.env.REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 const textractClient = new TextractClient({
-  region: process.env.REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 const rekognitionClient = new RekognitionClient({
-  region: process.env.REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 const dynamoClient = new DynamoDBClient({
-    region: process.env.REGION,
+    region: process.env.AWS_REGION,
     credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID!,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
     },
 });
 
@@ -76,24 +76,17 @@ async function invokeClaude(prompt: string) {
 }
 
 async function getCoreConcepts(userInput: string) {
-  const prompt = `You are a business analyst. Analyze the following user input and identify the core concepts of the business. Return a JSON object with the keys "industry", "targetAudience", and "valueProposition".
-
-User input: "${userInput}"`;
+  const prompt = `You are a business analyst. Analyze the following user input and identify the core concepts of the business. Return a JSON object with the keys "industry", "targetAudience", and "valueProposition".\n\nUser input: "${userInput}"`;
   return await invokeClaude(prompt);
 }
 
 async function getMarketingChannelsAndKPIs(coreConcepts: any) {
-  const prompt = `You are a marketing strategist. Based on the following core business concepts, recommend the most effective marketing channels and 3-5 key performance indicators (KPIs). Return a JSON object with the keys "marketingChannels" (an array of strings) and "kpis" (an array of strings).
-
-Core concepts: ${JSON.stringify(coreConcepts)}`;
+  const prompt = `You are a marketing strategist. Based on the following core business concepts, recommend the most effective marketing channels and 3-5 key performance indicators (KPIs). Return a JSON object with the keys "marketingChannels" (an array of strings) and "kpis" (an array of strings).\n\nCore concepts: ${JSON.stringify(coreConcepts)}`;
   return await invokeClaude(prompt);
 }
 
 async function getExecutiveSummary(coreConcepts: any, marketingPlan: any) {
-  const prompt = `You are a business writer. Based on the following core business concepts and marketing plan, write a concise executive summary. Return a JSON object with the key "executiveSummary".
-
-Core concepts: ${JSON.stringify(coreConcepts)}
-Marketing plan: ${JSON.stringify(marketingPlan)}`;
+  const prompt = `You are a business writer. Based on the following core business concepts and marketing plan, write a concise executive summary. Return a JSON object with the key "executiveSummary".\n\nCore concepts: ${JSON.stringify(coreConcepts)}\nMarketing plan: ${JSON.stringify(marketingPlan)}`;
   return await invokeClaude(prompt);
 }
 

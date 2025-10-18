@@ -58,7 +58,7 @@ Before submitting your project, please make sure to go through the following che
     *   A list of the key features.
     *   A link to your architecture diagram.
     *   Clear instructions on how to run the project locally.
-    *   A link to your live demo (if available).
+    *   A link to your live demo: https://main.d3o2i8glsyhdm9.amplifyapp.com/
 *   [ ] **Provide a Demo Video:** Create a 3-minute demo video that showcases the end-to-end workflow of your application. See the [demo_script.md](demo_script.md) for a sample script.
 *   [ ] **Check for Exposed Credentials:** Double-check your entire codebase and commit history to ensure you have not accidentally committed any API keys or other sensitive credentials.
 *   [ ] **Test Your Application:** Run through the integration testing plan in [test.md](test.md) to make sure everything is working as expected.

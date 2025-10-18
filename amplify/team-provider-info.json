@@ -4,11 +4,11 @@
       "AuthRoleName": "amplify-harmonymarketinghub-dev-d7f20-authRole",
       "UnauthRoleArn": "arn:aws:iam::114501972554:role/amplify-harmonymarketinghub-dev-d7f20-unauthRole",
       "AuthRoleArn": "arn:aws:iam::114501972554:role/amplify-harmonymarketinghub-dev-d7f20-authRole",
-      "Region": "eu-north-1",
+      "Region": "us-east-1",
       "DeploymentBucketName": "amplify-harmonymarketinghub-dev-d7f20-deployment",
       "UnauthRoleName": "amplify-harmonymarketinghub-dev-d7f20-unauthRole",
       "StackName": "amplify-harmonymarketinghub-dev-d7f20",
-      "StackId": "arn:aws:cloudformation:eu-north-1:114501972554:stack/amplify-harmonymarketinghub-dev-d7f20/65240b50-aa97-11f0-b854-0e692bfd4475",
+      "StackId": "arn:aws:cloudformation:us-east-1:114501972554:stack/amplify-harmonymarketinghub-dev-d7f20/65240b50-aa97-11f0-b854-0e692bfd4475",
       "AmplifyAppId": "d3o2i8glsyhdm9"
     },
     "categories": {

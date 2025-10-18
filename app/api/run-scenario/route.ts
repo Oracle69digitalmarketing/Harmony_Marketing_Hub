@@ -4,10 +4,10 @@ import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedroc
 
 // Initialize the Bedrock client (using the corrected environment variables)
 const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -50,9 +50,7 @@ export async function POST(request: NextRequest) {
     const prompt = `Based on the following business goal, generate a structured business plan. 
     The output must be a single, valid JSON object with the following keys: "executiveSummary", "industry", "targetAudience", "valueProposition", "marketingChannels", "kpis".
     Each key should have a string value, except for "marketingChannels" and "kpis" which should be arrays of strings.
-    Do not include any text or formatting outside of the JSON object.
-
-    Business Goal: ${goal}`;
+    Do not include any text or formatting outside of the JSON object.\n\n    Business Goal: ${goal}`;
 
     const generatedPlan = await invokeClaude(prompt);
 
