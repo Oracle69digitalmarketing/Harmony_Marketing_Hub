@@ -11,7 +11,7 @@ This file contains the necessary IAM policy to run the Harmony Marketing Hub app
         {
             "Effect": "Allow",
             "Action": "bedrock:InvokeModel",
-            "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
+            "Resource": "arn:aws:bedrock:eu-north-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
         },
         {
             "Effect": "Allow",
@@ -60,7 +60,7 @@ This file contains the necessary IAM policy to run the Harmony Marketing Hub app
 4.  **Copy the JSON policy** from this file and paste it into the JSON editor in the AWS console.
 5.  **Replace the placeholder values** in the JSON code with your actual values:
     *   `your-s3-bucket-name`: The name of the S3 bucket you are using for this project.
-    *   `your-aws-region`: The AWS region where your resources are located (e.g., `us-east-1`).
+    *   `your-aws-region`: The AWS region where your resources are located (e.g., `eu-north-1`).
     *   `your-account-id`: Your 12-digit AWS account ID.
 6.  **Review and create the policy**. Give it a descriptive name, like "HarmonyMarketingHubPolicy".
 7.  **Attach the policy to your IAM user**. Go to your IAM user's page, click the "Add permissions" button, and attach the "HarmonyMarketingHubPolicy" you just created.

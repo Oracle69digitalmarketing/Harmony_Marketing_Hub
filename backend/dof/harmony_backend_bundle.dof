@@ -1,7 +1,7 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
-const REGION = process.env.REGION || "us-east-1";
+const REGION = process.env.REGION || "eu-north-1";
 const TABLE_NAME = process.env.DYNAMO_CAMPAIGNS || "HarmonyCampaigns";
 
 const dynamo = new DynamoDBClient({ region: REGION });

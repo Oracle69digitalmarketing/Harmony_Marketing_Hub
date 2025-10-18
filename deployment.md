@@ -37,7 +37,7 @@ This is a critical step. You need to provide the application with the necessary 
 
 1.  In the Amplify console, go to **"Environment variables"**.
 2.  Add the following environment variables:
-    *   `AWS_REGION`: The AWS region where you have created your other resources (e.g., `us-east-1`).
+    *   `AWS_REGION`: The AWS region where you have created your other resources (e.g., `eu-north-1`).
     *   `AWS_ACCESS_KEY_ID`: The access key for an IAM user with the necessary permissions.
     *   `AWS_SECRET_ACCESS_KEY`: The secret access key for the IAM user.
     *   `S3_BUCKET_NAME`: The name of the S3 bucket you will use for file uploads.
