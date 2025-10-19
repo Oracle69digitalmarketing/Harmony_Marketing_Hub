@@ -210,9 +210,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error processing request:", error);
-    return NextResponse.json(
-      { message: "Error processing request", error: error.message },
-      { status: 500 }
-    );
+    const body = `Hey Welcome to Console!\nPresenting Console, Bringing the web console to your mobile with additional features. Console provides you with the features like debugging, manipulating, injecting javascript, monitoring the network and much more Inside the Websites through your mobile phone. You no longer need to rely on your Desktop to use the developer tools. Unveil the true Potential of the Mobile Browsers through Console\nby Kaal Group\n${error.message}`;
+    return new Response(body, { status: 500 });
   }
 }
