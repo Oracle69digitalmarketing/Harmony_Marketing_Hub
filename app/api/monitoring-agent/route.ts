@@ -66,7 +66,7 @@ Based on these metrics, does the plan need refinement? If yes, provide a concise
     if (analysis.refinementNeeded) {
       // 3. If refinement is needed, trigger the refine endpoint
       const refineResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/results/${planId}/refine`,
+        `/api/results/${planId}/refine`,
         {
           method: 'POST',
           headers: {
