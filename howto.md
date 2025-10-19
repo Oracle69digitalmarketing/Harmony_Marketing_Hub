@@ -139,14 +139,164 @@ import { Twilio } from "twilio";
         break;
 ```
 
-## 3. Social Media Campaigns
+## 3. Setting up 'Wow Features'
 
-Integrating with social media platforms like Twitter, Facebook, or LinkedIn follows a similar pattern to the Twilio integration:
+To enable the A/B Testing, Social Listening, and Customer Journey Funnel features, you need to create the corresponding DynamoDB tables and add some sample data. Here are the AWS CLI commands to do so.
 
-1.  **Create a Developer Account:** Sign up for a developer account on the platform you want to use.
-2.  **Get API Keys:** Create an app and get your API keys and access tokens.
-3.  **Store Credentials Securely:** Use Amplify environment variables or AWS Secrets Manager.
-4.  **Use the Official SDK:** Install the official SDK for the platform (e.g., `twitter-api-v2` for Twitter) and use it in your `executeCampaign` function.
+### 3.1. A/B Testing
+
+**Create the table:**
+```bash
+aws dynamodb create-table \
+    --table-name HarmonyMarketingHub-ABTests \
+    --attribute-definitions \
+        AttributeName=testId,AttributeType=S \
+    --key-schema \
+        AttributeName=testId,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5
+```
+
+**Add sample data:**
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-ABTests \
+    --item 
+```json
+{
+        "testId": {"S": "test1"},
+        "testName": {"S": "New Homepage CTA"},
+        "status": {"S": "running"},
+        "versionA_visitors": {"N": "1024"},
+        "versionA_conversions": {"N": "128"},
+        "versionB_visitors": {"N": "1012"},
+        "versionB_conversions": {"N": "156"}
+    }
+```
+
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-ABTests \
+    --item 
+```json
+{
+        "testId": {"S": "test2"},
+        "testName": {"S": "Pricing Page Layout"},
+        "status": {"S": "completed"},
+        "versionA_visitors": {"N": "2048"},
+        "versionA_conversions": {"N": "256"},
+        "versionB_visitors": {"N": "2012"},
+        "versionB_conversions": {"N": "312"}
+    }
+```
+
+### 3.2. Social Listening
+
+**Create the table:**
+```bash
+aws dynamodb create-table \
+    --table-name HarmonyMarketingHub-SocialListening \
+    --attribute-definitions \
+        AttributeName=keyword,AttributeType=S \
+    --key-schema \
+        AttributeName=keyword,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5
+```
+
+**Add sample data:**
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-SocialListening \
+    --item 
+```json
+{
+        "keyword": {"S": "BrandX"},
+        "last_updated": {"S": "2025-10-19T12:00:00Z"},
+        "positive_mentions": {"N": "1200"},
+        "negative_mentions": {"N": "300"},
+        "neutral_mentions": {"N": "600"},
+        "sentiment_trend": {"S": "positive"}
+    }
+```
+
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-SocialListening \
+    --item 
+```json
+{
+        "keyword": {"S": "ProductY"},
+        "last_updated": {"S": "2025-10-19T12:00:00Z"},
+        "positive_mentions": {"N": "50"},
+        "negative_mentions": {"N": "80"},
+        "neutral_mentions": {"N": "120"},
+        "sentiment_trend": {"S": "negative"}
+    }
+```
+
+### 3.3. Customer Journey Funnel
+
+**Create the table:**
+```bash
+aws dynamodb create-table \
+    --table-name HarmonyMarketingHub-CustomerJourney \
+    --attribute-definitions \
+        AttributeName=stageOrder,AttributeType=N \
+    --key-schema \
+        AttributeName=stageOrder,KeyType=HASH \
+    --provisioned-throughput \
+        ReadCapacityUnits=5,WriteCapacityUnits=5
+```
+
+**Add sample data:**
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-CustomerJourney \
+    --item 
+```json
+{
+        "stageOrder": {"N": "1"},
+        "stageName": {"S": "Awareness"},
+        "userCount": {"N": "10000"}
+    }
+```
+
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-CustomerJourney \
+    --item 
+```json
+{
+        "stageOrder": {"N": "2"},
+        "stageName": {"S": "Consideration"},
+        "userCount": {"N": "2500"}
+    }
+```
+
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-CustomerJourney \
+    --item 
+```json
+{
+        "stageOrder": {"N": "3"},
+        "stageName": {"S": "Conversion"},
+        "userCount": {"N": "500"}
+    }
+```
+
+```bash
+aws dynamodb put-item \
+    --table-name HarmonyMarketingHub-CustomerJourney \
+    --item 
+```json
+{
+        "stageOrder": {"N": "4"},
+        "stageName": {"S": "Loyalty"},
+        "userCount": {"N": "200"}
+    }
+```
 
 ## Final Code Example
 

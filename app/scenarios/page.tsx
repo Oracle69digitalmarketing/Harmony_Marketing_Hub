@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -10,27 +10,56 @@ import { Brain, TrendingUp, DollarSign, Target, Lightbulb, Play, Save } from "lu
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Bar, BarChart } from "recharts"
 
-const scenarioData = [
-  { month: "Jan", conservative: 15000, moderate: 22000, aggressive: 35000 },
-  { month: "Feb", conservative: 18000, moderate: 28000, aggressive: 42000 },
-  { month: "Mar", conservative: 22000, moderate: 35000, aggressive: 55000 },
-  { month: "Apr", conservative: 25000, moderate: 40000, aggressive: 65000 },
-  { month: "May", conservative: 28000, moderate: 45000, aggressive: 75000 },
-  { month: "Jun", conservative: 32000, moderate: 52000, aggressive: 88000 },
-]
-
-const channelAllocation = [
-  { channel: "Google Ads", current: 35, optimized: 42 },
-  { channel: "Facebook", current: 25, optimized: 28 },
-  { channel: "LinkedIn", current: 15, optimized: 18 },
-  { channel: "Email", current: 10, optimized: 8 },
-  { channel: "Display", current: 15, optimized: 4 },
-]
-
 export default function ScenariosPage() {
   const [budgetSlider, setBudgetSlider] = useState([100000])
   const [timeframe, setTimeframe] = useState(6)
   const [riskLevel, setRiskLevel] = useState("moderate")
+  const [scenarioData, setScenarioData] = useState([])
+  const [channelAllocation, setChannelAllocation] = useState([])
+  const [aiRecommendations, setAiRecommendations] = useState([])
+  const [expectedRoi, setExpectedRoi] = useState(0)
+  const [projectedLeads, setProjectedLeads] = useState(0)
+  const [costPerLead, setCostPerLead] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const runSimulation = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/run-scenario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          budget: budgetSlider[0],
+          timeframe,
+          riskLevel,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch scenario data')
+      }
+
+      const data = await response.json()
+      setScenarioData(data.scenarioData)
+      setChannelAllocation(data.channelAllocation)
+      setAiRecommendations(data.aiRecommendations)
+      setExpectedRoi(data.expectedRoi)
+      setProjectedLeads(data.projectedLeads)
+      setCostPerLead(data.costPerLead)
+    } catch (error: any) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    runSimulation()
+  }, [])
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -52,12 +81,23 @@ export default function ScenariosPage() {
                   <Save className="mr-2 h-4 w-4" />
                   Save Scenario
                 </Button>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  onClick={runSimulation}
+                  disabled={loading}
+                >
                   <Play className="mr-2 h-4 w-4" />
-                  Run Simulation
+                  {loading ? 'Running...' : 'Run Simulation'}
                 </Button>
               </div>
             </div>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong className="font-bold">Error:</strong>
+                <span className="block sm:inline"> {error}</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Scenario Controls */}
@@ -99,10 +139,10 @@ export default function ScenariosPage() {
                   <div>
                     <label className="text-sm font-medium mb-3 block">Risk Level</label>
                     <div className="space-y-2">
-                      {["conservative", "moderate", "aggressive"].map((level) => (
+                      {['conservative', 'moderate', 'aggressive'].map((level) => (
                         <Button
                           key={level}
-                          variant={riskLevel === level ? "default" : "outline"}
+                          variant={riskLevel === level ? 'default' : 'outline'}
                           className="w-full justify-start"
                           onClick={() => setRiskLevel(level)}
                         >
@@ -115,18 +155,12 @@ export default function ScenariosPage() {
                   <div className="pt-4 border-t">
                     <h4 className="font-medium mb-2">AI Recommendations</h4>
                     <div className="space-y-2">
-                      <div className="flex items-center text-sm">
-                        <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                        <span>Increase Google Ads by 20%</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                        <span>Reduce Display spend by 60%</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                        <span>Focus on mobile targeting</span>
-                      </div>
+                      {aiRecommendations.map((rec, index) => (
+                        <div key={index} className="flex items-center text-sm">
+                          <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
+                          <span>{rec}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </CardContent>
@@ -143,16 +177,16 @@ export default function ScenariosPage() {
                     <ChartContainer
                       config={{
                         conservative: {
-                          label: "Conservative",
-                          color: "hsl(var(--chart-1))",
+                          label: 'Conservative',
+                          color: 'hsl(var(--chart-1))',
                         },
                         moderate: {
-                          label: "Moderate",
-                          color: "hsl(var(--chart-2))",
+                          label: 'Moderate',
+                          color: 'hsl(var(--chart-2))',
                         },
                         aggressive: {
-                          label: "Aggressive",
-                          color: "hsl(var(--chart-3))",
+                          label: 'Aggressive',
+                          color: 'hsl(var(--chart-3))',
                         },
                       }}
                       className="h-[300px]"
@@ -199,12 +233,12 @@ export default function ScenariosPage() {
                     <ChartContainer
                       config={{
                         current: {
-                          label: "Current",
-                          color: "hsl(var(--chart-1))",
+                          label: 'Current',
+                          color: 'hsl(var(--chart-1))',
                         },
                         optimized: {
-                          label: "Optimized",
-                          color: "hsl(var(--chart-2))",
+                          label: 'Optimized',
+                          color: 'hsl(var(--chart-2))',
                         },
                       }}
                       className="h-[300px]"
@@ -235,7 +269,7 @@ export default function ScenariosPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">287%</div>
+                  <div className="text-3xl font-bold">{expectedRoi}%</div>
                   <p className="text-sm text-gray-600 mt-1">+23% improvement over current performance</p>
                 </CardContent>
               </Card>
@@ -248,7 +282,7 @@ export default function ScenariosPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">18,450</div>
+                  <div className="text-3xl font-bold">{projectedLeads.toLocaleString()}</div>
                   <p className="text-sm text-gray-600 mt-1">Based on optimized allocation</p>
                 </CardContent>
               </Card>
@@ -261,7 +295,7 @@ export default function ScenariosPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">$5.42</div>
+                  <div className="text-3xl font-bold">${costPerLead.toFixed(2)}</div>
                   <p className="text-sm text-gray-600 mt-1">-18% reduction from current CPL</p>
                 </CardContent>
               </Card>
