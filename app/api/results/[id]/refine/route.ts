@@ -7,7 +7,7 @@ const dynamoClient = new DynamoDBClient({ region: process.env.REGION });
 
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
 
 async function invokeClaude(prompt: string) {
   const command = new InvokeModelCommand({
@@ -48,7 +48,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     // 1. Get the current plan from DynamoDB
-      TableName: process.env.DYNAMODB_RESULTS_TABLE,
+    const getCommand = new GetCommand({
+      TableName: process.env.DYNAMODB_RESULTS_TABLE!,
       Key: { id },
     });
     const { Item } = await docClient.send(getCommand);
