@@ -12,14 +12,26 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         // Add your own logic here to find the user from the credentials.
-        // For this example, we'll use a hardcoded user.
-        const user = {
-          id: "1",
-          name: "Oracle69",
-          email: "jsmith@example.com"
-        }
+        const users = [
+          {
+            id: "1",
+            name: "Oracle69",
+            email: "adewale@oracle69.com",
+            role: "admin",
+            password: "password"
+          },
+          {
+            id: "2",
+            name: "demo",
+            email: "demo@example.com",
+            role: "demo",
+            password: "demo"
+          }
+        ]
 
-        if (credentials?.username === user.name && credentials?.password === "password") {
+        const user = users.find(user => user.name === credentials?.username && user.password === credentials?.password)
+
+        if (user) {
           return user
         } else {
           return null
@@ -27,11 +39,17 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

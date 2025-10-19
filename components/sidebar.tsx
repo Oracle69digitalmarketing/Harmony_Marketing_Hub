@@ -22,6 +22,8 @@ import {
   ChevronRight,
 } from "lucide-react"
 
+import { useSession } from "next-auth/react"
+
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "AI Scenario Runner", href: "/scenario-runner", icon: Brain },
@@ -39,6 +41,7 @@ const navigation = [
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   return (
     <div
@@ -84,6 +87,21 @@ export function Sidebar() {
               </Link>
             )
           })}
+          {session?.user?.role === 'admin' && (
+            <Link href="/admin">
+              <Button
+                variant={pathname === '/admin' ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start",
+                  collapsed ? "px-2" : "px-3",
+                  pathname === '/admin' && "bg-blue-600 text-white hover:bg-blue-700",
+                )}
+              >
+                <Shield className={cn("h-4 w-4", collapsed ? "" : "mr-3")} />
+                {!collapsed && <span>Admin</span>}
+              </Button>
+            </Link>
+          )}
         </nav>
       </ScrollArea>
     </div>
