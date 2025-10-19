@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         // For this example, we'll use a hardcoded user.
         const user = {
           id: "1",
-          name: "J Smith",
+          name: "Oracle69",
           email: "jsmith@example.com"
         }
 

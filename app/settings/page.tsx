@@ -11,8 +11,8 @@ import { Header } from "@/components/header"
 
 export default function SettingsPage() {
   const { setTheme } = useTheme()
-  const [name, setName] = useState("John Doe")
-  const [email, setEmail] = useState("john@oracle69.com")
+  const [name, setName] = useState("Adewale Adewumi")
+  const [email, setEmail] = useState("adewale@oracle69.com")
 
   const handleSaveProfile = async () => {
     try {
