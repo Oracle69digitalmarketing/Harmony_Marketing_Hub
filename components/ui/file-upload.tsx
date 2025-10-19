@@ -5,6 +5,7 @@ export function FileUpload() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [processedData, setProcessedData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -18,18 +19,21 @@ export function FileUpload() {
     if (!uploadedFile) return;
 
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append('file', uploadedFile);
+    setUploadProgress(0);
 
-    try {
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload', true);
 
-      const uploadData = await uploadResponse.json();
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setUploadProgress(percentComplete);
+      }
+    };
 
-      if (uploadResponse.ok) {
+    xhr.onload = async () => {
+      if (xhr.status === 200) {
+        const uploadData = JSON.parse(xhr.responseText);
         const processResponse = await fetch('/api/process-input', {
           method: 'POST',
           headers: {
@@ -44,12 +48,19 @@ export function FileUpload() {
         const processData = await processResponse.json();
         setProcessedData(processData);
       } else {
-        console.error('Upload failed:', uploadData.message);
+        console.error('Upload failed:', xhr.statusText);
       }
-    } catch (error) {
-      console.error('Error during upload and process:', error);
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    xhr.onerror = () => {
+      console.error('Error during upload and process:');
+      setIsLoading(false);
+    };
+
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    xhr.send(formData);
   };
 
   return (
@@ -69,11 +80,16 @@ export function FileUpload() {
       {uploadedFile && (
         <div className="mt-4">
           <p>Selected file: {uploadedFile.name}</p>
+          {isLoading && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+              <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+            </div>
+          )}
           <button
             onClick={handleUpload}
             disabled={isLoading}
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-400">
-            {isLoading ? 'Processing...' : 'Upload and Process'}
+            {isLoading ? `Processing... ${uploadProgress}%` : 'Upload and Process'}
           </button>
         </div>
       )}

@@ -31,6 +31,8 @@ export default function Dashboard() {
   const [campaignMetrics, setCampaignMetrics] = useState<any[]>([]);
   const [recommendations, setRecommendations] = useState<any>(null);
   const [monitoringResult, setMonitoringResult] = useState<any>(null);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -132,6 +134,27 @@ export default function Dashboard() {
     setIsLoading(false);
   };
 
+  const handleGenerateImage = async () => {
+    if (!imagePrompt) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: imagePrompt }),
+      });
+
+      const data = await response.json();
+      setGeneratedImage(data.image);
+    } catch (error) {
+      console.error('Error generating image:', error);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -227,6 +250,32 @@ export default function Dashboard() {
                         </Button>
                       </div>
                     )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Image Generation Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Generate Images</CardTitle>
+                <CardDescription>
+                  Create images for your marketing campaigns using AI.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={imagePrompt}
+                  onChange={(e) => setImagePrompt(e.target.value)}
+                  placeholder="Enter a prompt to generate an image..."
+                  className="mb-2"
+                />
+                <Button onClick={handleGenerateImage} disabled={isLoading}>
+                  {isLoading ? "Generating..." : "Generate Image"}
+                </Button>
+                {generatedImage && (
+                  <div className="mt-4">
+                    <img src={`data:image/png;base64,${generatedImage}`} alt="Generated Image" />
                   </div>
                 )}
               </CardContent>
