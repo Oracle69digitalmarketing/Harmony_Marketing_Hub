@@ -14,6 +14,7 @@
     "@aws-sdk/client-dynamodb": "^3.911.0",
     "@aws-sdk/client-rekognition": "^3.911.0",
     "@aws-sdk/client-s3": "^3.908.0",
+    "@aws-sdk/client-ses": "^3.913.0",
     "@aws-sdk/client-textract": "^3.911.0",
     "@aws-sdk/lib-dynamodb": "^3.911.0",
     "@hookform/resolvers": "^3.9.1",
@@ -77,5 +78,22 @@
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
-  }
+  },
+  "description": "**Harmony Marketing Hub** is an AI-powered agent that automates the entire marketing lifecycle, from strategy and planning to execution and analysis. Built for the AWS AI Agent Global Hackathon, this project showcases the power of Amazon Bedrock and other AWS services to create intelligent, autonomous systems.",
+  "main": "aws-exports.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub/issues"
+  },
+  "homepage": "https://github.com/Oracle69digitalmarketing/Harmony_Marketing_Hub#readme"
 }
