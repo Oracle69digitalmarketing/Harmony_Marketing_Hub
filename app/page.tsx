@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [monitoringResult, setMonitoringResult] = useState<any>(null);
   const [imagePrompt, setImagePrompt] = useState("");
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [adCopy, setAdCopy] = useState<any>(null);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -155,6 +156,27 @@ export default function Dashboard() {
     setIsLoading(false);
   };
 
+  const handleGenerateAdCopy = async () => {
+    if (!processedData) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/generate-ad-copy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ businessPlan: processedData.aiResponse }),
+      });
+
+      const data = await response.json();
+      setAdCopy(data);
+    } catch (error) {
+      console.error('Error generating ad copy:', error);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -236,6 +258,9 @@ export default function Dashboard() {
                       <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
                         {isEditing ? "Cancel" : "Edit"}
                       </Button>
+                      <Button onClick={handleGenerateAdCopy} disabled={isLoading}>
+                        {isLoading ? "Generating Ad Copy..." : "Generate Ad Copy"}
+                      </Button>
                     </div>
                     {isEditing && (
                       <div className="mt-4">
@@ -254,6 +279,26 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {adCopy && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Generated Ad Copy</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <h4 className="font-semibold">Google Ads</h4>
+                    <p><strong>Headline:</strong> {adCopy.googleAds.headline}</p>
+                    <p><strong>Body:</strong> {adCopy.googleAds.body}</p>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-semibold">Facebook Ads</h4>
+                    <p><strong>Headline:</strong> {adCopy.facebookAds.headline}</p>
+                    <p><strong>Body:</strong> {adCopy.facebookAds.body}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Image Generation Section */}
             <Card>
