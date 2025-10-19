@@ -32,7 +32,7 @@ const rekognitionClient = new RekognitionClient({
 });
 
 const bedrockClient = new BedrockRuntimeClient({
-    region: process.env.REGION,
+  region: process.env.REGION,
   credentials: {
     accessKeyId: process.env.ACCESS_KEY_ID!,
     secretAccessKey: process.env.SECRET_ACCESS_KEY!,
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error processing request:", error);
     return NextResponse.json(
-      { message: "Error processing request" },
+      { message: "Error processing request", error: error.message },
       { status: 500 }
     );
   }
