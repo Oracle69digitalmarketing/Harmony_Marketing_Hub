@@ -1,30 +1,63 @@
-import NextAuth from 'next-auth'
+import NextAuth, { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
-const handler = NextAuth({
+const dynamoClient = new DynamoDBClient({ region: process.env.REGION });
+const docClient = DynamoDBDocumentClient.from(dynamoClient);
+
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        username: { label: "Username", type: "text", placeholder: "jsmith@example.com" },
         password: {  label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        // Add your own logic here to find the user from the credentials.
-        const user = { id: "1", name: 'J Smith', email: 'jsmith@example.com' }
+        if (!credentials) {
+          return null;
+        }
 
-        if (user) {
-          // Any object returned will be saved in `user` property of the JWT
-          return user
+        const command = new QueryCommand({
+          TableName: process.env.DYNAMODB_TABLE_NAME!,
+          IndexName: "email-index", // Assuming you have a GSI on the email field
+          KeyConditionExpression: "email = :email",
+          ExpressionAttributeValues: {
+            ":email": credentials.username,
+          },
+        });
+
+        const { Items } = await docClient.send(command);
+        const user = Items && Items[0];
+
+        if (user && user.password === credentials.password) { // Note: In a real app, you should hash passwords
+          return { id: user.id, name: user.name, email: user.email };
         } else {
-          // If you return null then an error will be displayed advising the user to check their details.
-          return null
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
+          return null;
         }
       }
     })
-  ]
-})
+  ],
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.uid;
+      }
+      return session;
+    },
+    jwt: async ({ user, token }) => {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+  },
+  session: {
+    strategy: 'jwt',
+  },
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

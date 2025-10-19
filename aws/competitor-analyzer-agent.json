@@ -1,0 +1,75 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Competitor Analyzer",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/analyze": {
+      "post": {
+        "summary": "Analyze a competitor's website.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "website": {
+                    "type": "string",
+                    "description": "The website of the competitor to analyze."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The analysis of the competitor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "website": {
+                      "type": "string"
+                    },
+                    "socialMedia": {
+                      "type": "object",
+                      "properties": {
+                        "twitter": {
+                          "type": "string"
+                        },
+                        "facebook": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "seo": {
+                      "type": "object",
+                      "properties": {
+                        "keywords": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "backlinks": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

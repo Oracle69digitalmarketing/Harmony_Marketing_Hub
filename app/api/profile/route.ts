@@ -1,23 +1,27 @@
 
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next"
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const dynamoClient = new DynamoDBClient({ region: process.env.REGION });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { name, email } = await request.json();
-
-    // For now, we'll just log the data. 
-    // In a real implementation, you would get the user ID from the session.
-    console.log("Updating profile for user:", { name, email });
 
     const command = new UpdateCommand({
       TableName: process.env.DYNAMODB_TABLE_NAME!,
       Key: {
-        id: "1", // Replace with the actual user ID from session
+        id: session.user.id,
       },
       UpdateExpression: "set #name = :name, #email = :email",
       ExpressionAttributeNames: {

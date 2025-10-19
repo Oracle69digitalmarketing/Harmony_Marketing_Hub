@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,8 +12,16 @@ import { Header } from "@/components/header"
 
 export default function SettingsPage() {
   const { setTheme } = useTheme()
-  const [name, setName] = useState("Adewale Adewumi")
-  const [email, setEmail] = useState("adewale@oracle69.com")
+  const { data: session, status } = useSession()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+
+  useEffect(() => {
+    if (session?.user) {
+      setName(session.user.name ?? "")
+      setEmail(session.user.email ?? "")
+    }
+  }, [session])
 
   const handleSaveProfile = async () => {
     try {
@@ -34,6 +43,10 @@ export default function SettingsPage() {
       console.error("Error saving profile:", error);
     }
   };
+
+  if (status === "loading") {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">

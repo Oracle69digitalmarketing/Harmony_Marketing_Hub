@@ -298,6 +298,71 @@ aws dynamodb put-item \
     }
 ```
 
+## 4. Setting up Bedrock Agents
+
+To enable the AI-powered features like social media posting and competitor analysis, you need to create and configure Bedrock Agents.
+
+### 4.1. Social Media Marketing Agent
+
+This agent will be responsible for posting content to social media platforms.
+
+**1. Create the Lambda Function:**
+
+First, you need a Lambda function that the agent can invoke. The code for this function is located at `lambda/social-media-poster/index.ts`. You will need to deploy this function to your AWS account. You can do this using the AWS CLI or the AWS Management Console.
+
+**2. Create the Agent:**
+
+Once the Lambda function is deployed, you can create the Bedrock Agent.
+
+1.  Go to the **Amazon Bedrock console**.
+2.  In the navigation pane, choose **Agents**.
+3.  Choose **Create Agent**.
+4.  Give the agent a name, for example, `SocialMediaMarketingAgent`.
+5.  In the **Agent instructions**, enter the following: "You are a social media marketing agent. You can post content to different social media platforms."
+6.  Create a new **Action Group**.
+7.  Give the action group a name, for example, `SocialMediaPoster`.
+8.  For the **Lambda function**, select the `social-media-poster` function you deployed earlier.
+9.  For the **API schema**, use the content of the `aws/social-media-poster-agent.json` file.
+10. Finish creating the agent.
+
+**3. Update the API Route:**
+
+After creating the agent, you need to get the **Agent ID** and **Agent Alias ID** from the Bedrock console. Then, open the `app/api/social-post/route.ts` file and replace the placeholder values with your actual IDs:
+
+```typescript
+// Replace with your Bedrock Agent ID and Alias ID
+const agentId = "YOUR_AGENT_ID";
+const agentAliasId = "YOUR_AGENT_ALIAS_ID";
+```
+
+### 4.2. Competitor Analysis Agent
+
+This agent will be responsible for gathering information about competitors.
+
+**1. Create the Lambda Function:**
+
+The code for this function is located at `lambda/competitor-analyzer/index.ts`. Deploy this function to your AWS account.
+
+**2. Create the Agent:**
+
+1.  Go to the **Amazon Bedrock console** and create a new agent.
+2.  Give the agent a name, for example, `CompetitorAnalysisAgent`.
+3.  In the **Agent instructions**, enter the following: "You are a competitor analysis agent. You can get information about a competitor's website."
+4.  Create a new **Action Group** named `CompetitorAnalyzer`.
+5.  For the **Lambda function**, select the `competitor-analyzer` function.
+6.  For the **API schema**, use the content of the `aws/competitor-analyzer-agent.json` file.
+7.  Finish creating the agent.
+
+**3. Update the API Route:**
+
+Get the **Agent ID** and **Agent Alias ID** from the Bedrock console and update the `app/api/competitor-analysis/route.ts` file:
+
+```typescript
+// Replace with your Bedrock Agent ID and Alias ID
+const agentId = "YOUR_COMPETITOR_AGENT_ID";
+const agentAliasId = "YOUR_COMPETITOR_AGENT_ALIAS_ID";
+```
+
 ## Final Code Example
 
 Here's what your `lambda/campaign-manager.ts` might look like with the SES and Twilio examples integrated:

@@ -26,7 +26,11 @@ import { useSession } from "next-auth/react"
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
+  { name: "Growth Agent", href: "/growth-agent", icon: Brain },
   { name: "AI Scenario Runner", href: "/scenario-runner", icon: Brain },
+  { name: "Copywriting", href: "/copywriting", icon: FileText },
+  { name: "Social Media", href: "/social-media", icon: MessageSquare },
+  { name: "Competitor Analytics", href: "/competitor-analytics", icon: TrendingUp },
   { name: "Campaigns", href: "/campaigns", icon: Target },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "A/B Testing", href: "/ab-testing", icon: FileText },

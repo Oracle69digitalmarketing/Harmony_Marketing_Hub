@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
 // Initialize the Bedrock client (using the corrected environment variables)
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
 
 // Helper function to invoke the Claude model
 async function invokeClaude(prompt: string) {
@@ -42,7 +42,14 @@ export async function POST(request: NextRequest) {
 
     // Define the prompt for the AI model
     const prompt = `Based on a total budget of $${budget}, a timeframe of ${timeframe} months, and a '${riskLevel}' risk level, generate scenario data for a marketing campaign.
-    The output must be a single, valid JSON object with the following keys: "scenarioData", "channelAllocation", "aiRecommendations", "expectedRoi", "projectedLeads", "costPerLead".
+    The output must be a single, valid JSON object with the following keys: "executiveSummary", "industry", "targetAudience", "valueProposition", "marketingChannels", "kpis", "scenarioData", "channelAllocation", "aiRecommendations", "expectedRoi", "projectedLeads", "costPerLead".
+
+    "executiveSummary" should be a string summarizing the plan.
+    "industry" should be a string identifying the industry.
+    "targetAudience" should be a string describing the target audience.
+    "valueProposition" should be a string explaining the value proposition.
+    "marketingChannels" should be an array of strings, each representing a marketing channel.
+    "kpis" should be an array of strings, each representing a key performance indicator.
 
     "scenarioData" should be an array of 6 objects, each with the following properties:
     - "month": (string) The month of the scenario (e.g., "Jan", "Feb", "Mar").

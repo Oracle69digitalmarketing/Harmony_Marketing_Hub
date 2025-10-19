@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Autonomous Growth Agent",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/generate-strategy": {
+      "post": {
+        "summary": "Generate a growth strategy for a business idea.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idea": {
+                    "type": "string",
+                    "description": "The business idea or business plan."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The generated growth strategy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "marketResearch": {
+                      "type": "string"
+                    },
+                    "competitorAnalysis": {
+                      "type": "string"
+                    },
+                    "swotAnalysis": {
+                      "type": "object",
+                      "properties": {
+                        "strengths": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "weaknesses": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "opportunities": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "threats": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "marketingStrategy": {
+                      "type": "object",
+                      "properties": {
+                        "targetAudience": {
+                          "type": "string"
+                        },
+                        "valueProposition": {
+                          "type": "string"
+                        },
+                        "channels": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "contentCalendar": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "month": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "financialProjections": {
+                      "type": "object",
+                      "properties": {
+                        "startupCosts": {
+                          "type": "number"
+                        },
+                        "revenueForecast": {
+                          "type": "object",
+                          "properties": {
+                            "year1": {
+                              "type": "number"
+                            },
+                            "year2": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "roadmap": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "step": {
+                            "type": "number"
+                          },
+                          "task": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

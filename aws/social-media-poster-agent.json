@@ -1,0 +1,54 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Social Media Poster",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/post": {
+      "post": {
+        "summary": "Post content to a social media platform.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "platform": {
+                    "type": "string",
+                    "description": "The social media platform to post to (e.g., 'facebook', 'twitter', 'linkedin')."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The content of the post."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result of the post.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
