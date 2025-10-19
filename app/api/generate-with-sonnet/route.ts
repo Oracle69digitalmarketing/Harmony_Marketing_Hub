@@ -71,7 +71,7 @@ ${text}`;
 
     const resultId = uuidv4();
     const putCommand = new PutCommand({
-      TableName: "HarmonyMarketingHub-Results",
+      TableName: process.env.DYNAMODB_RESULTS_TABLE,
       Item: {
         id: resultId,
         aiResponse,

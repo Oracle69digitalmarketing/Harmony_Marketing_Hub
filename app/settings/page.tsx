@@ -14,11 +14,25 @@ export default function SettingsPage() {
   const [name, setName] = useState("John Doe")
   const [email, setEmail] = useState("john@oracle69.com")
 
-  const handleSaveProfile = () => {
-    // In a real application, you would call an API to save the user's profile.
-    // For this prototype, we'll just log it to the console.
-    console.log("Saving profile:", { name, email });
-    // Here you might want to show a toast notification for success.
+  const handleSaveProfile = async () => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email }),
+      });
+
+      if (response.ok) {
+        // Here you might want to show a toast notification for success.
+        console.log("Profile saved successfully");
+      } else {
+        console.error("Failed to save profile");
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   return (

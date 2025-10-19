@@ -3,23 +3,11 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
-const dynamoClient = new DynamoDBClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-});
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
-const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
 
 async function invokeClaude(prompt: string) {
   const command = new InvokeModelCommand({
@@ -57,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // 1. Fetch metrics from DynamoDB
     const metricsCommand = new ScanCommand({
-      TableName: "HarmonyMarketingHub-CampaignMetrics",
+      TableName: process.env.DYNAMODB_CAMPAIGNMETRICS_TABLE,
     });
     const { Items: metrics } = await docClient.send(metricsCommand);
 

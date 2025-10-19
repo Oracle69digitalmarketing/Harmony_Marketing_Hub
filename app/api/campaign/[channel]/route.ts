@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: { channel:
 
   try {
     const command = new QueryCommand({
-      TableName: "HarmonyMarketingHub-CampaignMetrics",
+      TableName: process.env.DYNAMODB_CAMPAIGNMETRICS_TABLE,
       KeyConditionExpression: "channel = :channel",
       ExpressionAttributeValues: {
         ":channel": channelName,

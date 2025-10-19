@@ -3,13 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
 // Initialize the Bedrock client (using the corrected environment variables)
-const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.REGION,
-  credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
-  },
-});
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
 
 // Helper function to invoke the Claude model
 async function invokeClaude(prompt: string) {

@@ -3,23 +3,11 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
-const dynamoClient = new DynamoDBClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-});
+const dynamoClient = new DynamoDBClient({ region: process.env.REGION });
 
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
-const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
 
 async function invokeClaude(prompt: string) {
   const command = new InvokeModelCommand({
@@ -60,8 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     // 1. Get the current plan from DynamoDB
-    const getCommand = new GetCommand({
-      TableName: "HarmonyMarketingHub-Results",
+      TableName: process.env.DYNAMODB_RESULTS_TABLE,
       Key: { id },
     });
     const { Item } = await docClient.send(getCommand);
@@ -86,7 +73,7 @@ Based on the instruction, refine the plan and return the updated plan as a singl
 
     // 4. Update the plan in DynamoDB
     const updateCommand = new UpdateCommand({
-      TableName: "HarmonyMarketingHub-Results",
+      TableName: process.env.DYNAMODB_RESULTS_TABLE,
       Key: { id },
       UpdateExpression: "set aiResponse = :aiResponse",
       ExpressionAttributeValues: {

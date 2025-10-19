@@ -2,20 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-const dynamoClient = new DynamoDBClient({
-    region: process.env.REGION,
-    credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID!,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY!,
-    },
-});
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 export async function GET(request: NextRequest) {
   try {
     const command = new ScanCommand({
-      TableName: "HarmonyMarketingHub-CampaignMetrics",
+      TableName: process.env.DYNAMODB_CAMPAIGNMETRICS_TABLE,
     });
 
     const { Items } = await docClient.send(command);

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // In a real app with many tests, you would use Query with an index.
     // For this prototype, Scan is acceptable.
     const command = new ScanCommand({
-      TableName: "HarmonyMarketingHub-ABTests",
+      TableName: process.env.DYNAMODB_ABTESTS_TABLE,
     });
 
     const { Items } = await docClient.send(command);

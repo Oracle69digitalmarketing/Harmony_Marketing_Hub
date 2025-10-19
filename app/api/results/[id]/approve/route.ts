@@ -3,13 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { executeCampaign } from "@/lambda/campaign-manager";
 
-const dynamoClient = new DynamoDBClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-});
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
@@ -18,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const { id } = params;
 
     const command = new UpdateCommand({
-      TableName: "HarmonyMarketingHub-Results",
+      TableName: process.env.DYNAMODB_RESULTS_TABLE,
       Key: {
         id,
       },
@@ -35,7 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     // Simulate the campaign execution trigger
     const getCommand = new GetCommand({
-        TableName: "HarmonyMarketingHub-Results",
+        TableName: process.env.DYNAMODB_RESULTS_TABLE,
         Key: { id },
     });
     const { Item } = await docClient.send(getCommand);

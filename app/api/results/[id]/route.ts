@@ -3,7 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const dynamoClient = new DynamoDBClient({
-    region: process.env.AWS_REGION,
+    region: process.env.REGION,
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const { id } = params;
 
     const command = new GetCommand({
-      TableName: "HarmonyMarketingHub-Results",
+      TableName: process.env.DYNAMODB_RESULTS_TABLE,
       Key: {
         id,
       },

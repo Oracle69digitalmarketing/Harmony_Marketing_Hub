@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
-const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.REGION,
-  credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
-  },
-});
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
 
 export async function POST(request: NextRequest) {
   try {

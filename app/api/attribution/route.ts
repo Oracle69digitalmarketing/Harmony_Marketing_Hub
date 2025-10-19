@@ -15,7 +15,7 @@ const docClient = DynamoDBDocumentClient.from(dynamoClient);
 export async function GET(request: NextRequest) {
   try {
     const command = new ScanCommand({
-      TableName: "HarmonyMarketingHub-Attribution",
+      TableName: process.env.DYNAMODB_ATTRIBUTION_TABLE,
     });
 
     const { Items } = await docClient.send(command);

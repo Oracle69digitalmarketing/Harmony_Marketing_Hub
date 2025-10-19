@@ -22,7 +22,7 @@ export function FileUpload() {
     setUploadProgress(0);
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/upload', true);
+    xhr.open('POST', '/api/s3-upload', true);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
