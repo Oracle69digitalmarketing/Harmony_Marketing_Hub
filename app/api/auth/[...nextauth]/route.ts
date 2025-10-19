@@ -39,7 +39,9 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  callbacks: {
+  session: {
+    strategy: "jwt",
+  },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
