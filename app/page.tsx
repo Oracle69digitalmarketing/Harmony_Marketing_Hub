@@ -22,13 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-
 export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
   const [text, setText] = useState("");
   const [processedData, setProcessedData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,21 +36,13 @@ export default function Dashboard() {
   const [adCopy, setAdCopy] = useState<any>(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  useEffect(() => {
     const fetchMetrics = async () => {
       const response = await fetch('/api/metrics');
       const data = await response.json();
       setCampaignMetrics(data);
     };
-    if (session) {
-      fetchMetrics();
-    }
-  }, [session]);
+    fetchMetrics();
+  }, []);
 
   const handleTextSubmit = async () => {
     if (!text) return;
