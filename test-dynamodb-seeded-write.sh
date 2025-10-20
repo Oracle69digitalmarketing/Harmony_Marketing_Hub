@@ -1,5 +1,5 @@
 #!/bin/bash
-REGION="eu-north-1"
+REGION="eu-central-1"
 PREFIX="HarmonyMarketingHub"
 
 echo "=== Testing Realistic DynamoDB Write Capability (Seeded Data) ==="

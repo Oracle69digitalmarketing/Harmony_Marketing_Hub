@@ -41,7 +41,7 @@ The AWS Command Line Interface (CLI) is a powerful tool for interacting with AWS
         ```
         (You can replace `my-dev-profile` with any name you like for your profile).
     *   Enter the `Access key ID` and `Secret access key` you just downloaded.
-    *   Set a default region (e.g., `eu-north-1`).
+    *   Set a default region (e.g., `eu-central-1`).
     *   Set a default output format (e.g., `json`).
 
 You can now run AWS commands using this profile, for example: `aws s3 ls --profile my-dev-profile`.

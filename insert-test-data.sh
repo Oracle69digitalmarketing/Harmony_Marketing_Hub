@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REGION="eu-north-1"
+REGION="eu-central-1"
 
 echo "=== Inserting Test Data into Harmony Marketing Hub Tables ==="
 

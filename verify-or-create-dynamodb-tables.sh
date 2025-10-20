@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REGION="eu-north-1"
+REGION="eu-central-1"
 PREFIX="HarmonyMarketingHub"
 
 echo "=== Harmony Marketing Hub DynamoDB Table Verification ==="

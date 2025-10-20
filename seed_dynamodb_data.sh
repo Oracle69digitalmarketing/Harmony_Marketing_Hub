@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-REGION="eu-north-1"
+REGION="eu-central-1"
 
 echo "=== Seeding A/B Tests ==="
 aws dynamodb put-item \
