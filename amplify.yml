@@ -1,0 +1,25 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Installing dependencies..."
+        - npm ci
+    build:
+      commands:
+        - echo "Building Harmony Marketing Hub for eu-central-1"
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+environment:
+  variables:
+    REACT_APP_AWS_REGION: eu-central-1
+    REACT_APP_BEDROCK_AGENT_GROWTH: 3AIZNPULT4
+    REACT_APP_BEDROCK_AGENT_COMPETITOR: YJW2SSY6FS
+    REACT_APP_BEDROCK_AGENT_SOCIAL: JC4WZAOTJ6
+    AWS_DEFAULT_REGION: eu-central-1
