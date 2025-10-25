@@ -2,11 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime";
 
-const bedrockAgentClient = new BedrockAgentRuntimeClient({ region: process.env.REGION });
+const bedrockAgentClient = new BedrockAgentRuntimeClient({});
 
 // Replace with your Bedrock Agent ID and Alias ID
-const agentId = "YOUR_COMPETITOR_AGENT_ID";
-const agentAliasId = "YOUR_COMPETITOR_AGENT_ALIAS_ID";
+const agentId = process.env.BEDROCK_AGENT_COMPETITOR;
+const agentAliasId = process.env.BEDROCK_AGENT_ALIAS_ID || "TSTALIASID"; // Default to TSTALIASID if not set
 
 export async function POST(request: NextRequest) {
   try {
