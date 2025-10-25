@@ -1,39 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
+import { invokeClaude } from "@/lib/bedrock";
 
-const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
-
+const dynamoClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
-
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION });
-
-async function invokeClaude(prompt: string) {
-  const command = new InvokeModelCommand({
-    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
-    contentType: "application/json",
-    accept: "application/json",
-    body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 1000,
-      messages: [
-        {
-          role: "user",
-          content: [{ type: "text", text: prompt }],
-        },
-      ],
-    }),
-  });
-
-  const { body } = await bedrockClient.send(command);
-  const responseBody = JSON.parse(new TextDecoder().decode(body));
-  try {
-    return JSON.parse(responseBody.content[0].text);
-  } catch (e) {
-    return responseBody.content[0].text;
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,7 +32,8 @@ ${JSON.stringify(metrics, null, 2)}
 
 Based on these metrics, does the plan need refinement? If yes, provide a concise instruction for what to refine. Return a JSON object with two keys: "refinementNeeded" (boolean) and "refinementInstruction" (a string, which is empty if no refinement is needed).`;
 
-    const analysis = await invokeClaude(prompt);
+    const analysisText = await invokeClaude(prompt);
+    const analysis = JSON.parse(analysisText);
 
     if (analysis.refinementNeeded) {
       // 3. If refinement is needed, trigger the refine endpoint

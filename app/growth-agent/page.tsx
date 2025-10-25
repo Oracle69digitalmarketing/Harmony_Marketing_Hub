@@ -11,13 +11,13 @@ import { Loader } from "lucide-react"
 export default function GrowthAgentPage() {
   const [idea, setIdea] = useState("");
   const [generatedStrategy, setGeneratedStrategy] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateStrategy = async () => {
     if (!idea) return;
 
-    setIsLoading(true);
+    setIsGeneratingStrategy(true);
     setError(null);
     setGeneratedStrategy(null);
 
@@ -40,7 +40,7 @@ export default function GrowthAgentPage() {
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsGeneratingStrategy(false);
     }
   };
 
@@ -64,8 +64,8 @@ export default function GrowthAgentPage() {
                     placeholder="e.g., 'A subscription box for dog toys'"
                     className="mb-2"
                   />
-                  <Button onClick={handleGenerateStrategy} disabled={isLoading || !idea}>
-                    {isLoading ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating Strategy...</> : "Generate Strategy"}
+                  <Button onClick={handleGenerateStrategy} disabled={isGeneratingStrategy || !idea}>
+                    {isGeneratingStrategy ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating Strategy...</> : "Generate Strategy"}
                   </Button>
                 </div>
 

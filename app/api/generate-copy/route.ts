@@ -1,32 +1,5 @@
-// This API route generates marketing copy using AWS Bedrock.
 import { NextRequest, NextResponse } from "next/server";
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-
-// Initialize the Bedrock client
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
-
-// Helper function to invoke the Claude model
-async function invokeClaude(prompt: string) {
-  const command = new InvokeModelCommand({
-    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
-    contentType: "application/json",
-    accept: "application/json",
-    body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 2000,
-      messages: [
-        {
-          role: "user",
-          content: [{ type: "text", text: prompt }],
-        },
-      ],
-    }),
-  });
-
-  const { body } = await bedrockClient.send(command);
-  const responseBody = JSON.parse(new TextDecoder().decode(body));
-  return responseBody.content[0].text;
-}
+import { invokeClaude } from "@/lib/bedrock";
 
 export async function POST(request: NextRequest) {
   try {

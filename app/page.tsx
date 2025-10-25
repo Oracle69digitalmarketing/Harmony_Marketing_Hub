@@ -25,7 +25,12 @@ import Link from "next/link"
 export default function Dashboard() {
   const [text, setText] = useState("");
   const [processedData, setProcessedData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessingText, setIsProcessingText] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
+  const [isGeneratingAdCopy, setIsGeneratingAdCopy] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isGettingRecommendations, setIsGettingRecommendations] = useState(false);
+  const [isRunningMonitoringAgent, setIsRunningMonitoringAgent] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [refinementInstruction, setRefinementInstruction] = useState("");
   const [campaignMetrics, setCampaignMetrics] = useState<any[]>([]);
@@ -47,7 +52,7 @@ export default function Dashboard() {
   const handleTextSubmit = async () => {
     if (!text) return;
 
-    setIsLoading(true);
+    setIsProcessingText(true);
     try {
       const processResponse = await fetch('/api/process-input', {
         method: 'POST',
@@ -62,7 +67,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error during text processing:', error);
     }
-    setIsLoading(false);
+    setIsProcessingText(false);
   };
 
   const handleApprove = async () => {
@@ -74,7 +79,7 @@ export default function Dashboard() {
   const handleRefine = async () => {
     if (!processedData?.resultId || !refinementInstruction) return;
 
-    setIsLoading(true);
+    setIsRefining(true);
     try {
       const refineResponse = await fetch(`/api/results/${processedData.resultId}/refine`, {
         method: 'POST',
@@ -89,13 +94,13 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error during refinement:', error);
     }
-    setIsLoading(false);
+    setIsRefining(false);
     setIsEditing(false);
     setRefinementInstruction("");
   };
 
   const handleGetRecommendations = async () => {
-    setIsLoading(true);
+    setIsGettingRecommendations(true);
     try {
       const response = await fetch('/api/recommendations', {
         method: 'POST',
@@ -109,13 +114,13 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error getting recommendations:', error);
     }
-    setIsLoading(false);
+    setIsGettingRecommendations(false);
   };
 
   const handleRunMonitoringAgent = async () => {
     if (!processedData?.resultId) return;
 
-    setIsLoading(true);
+    setIsRunningMonitoringAgent(true);
     try {
       const response = await fetch('/api/monitoring-agent', {
         method: 'POST',
@@ -132,13 +137,13 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error running monitoring agent:', error);
     }
-    setIsLoading(false);
+    setIsRunningMonitoringAgent(false);
   };
 
   const handleGenerateImage = async () => {
     if (!imagePrompt) return;
 
-    setIsLoading(true);
+    setIsGeneratingImage(true);
     try {
       const response = await fetch('/api/generate-image', {
         method: 'POST',
@@ -153,13 +158,13 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error generating image:', error);
     }
-    setIsLoading(false);
+    setIsGeneratingImage(false);
   };
 
   const handleGenerateAdCopy = async () => {
     if (!processedData) return;
 
-    setIsLoading(true);
+    setIsGeneratingAdCopy(true);
     try {
       const response = await fetch('/api/generate-ad-copy', {
         method: 'POST',
@@ -174,7 +179,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error generating ad copy:', error);
     }
-    setIsLoading(false);
+    setIsGeneratingAdCopy(false);
   };
 
   return (
@@ -212,8 +217,8 @@ export default function Dashboard() {
                     placeholder="Enter your business idea or marketing copy here..."
                     className="mb-2"
                   />
-                  <Button onClick={handleTextSubmit} disabled={isLoading}>
-                    {isLoading ? "Processing..." : "Process Text"}
+                  <Button onClick={handleTextSubmit} disabled={isProcessingText}>
+                    {isProcessingText ? "Processing..." : "Process Text"}
                   </Button>
                 </div>
                 {processedData && (
@@ -258,8 +263,8 @@ export default function Dashboard() {
                       <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
                         {isEditing ? "Cancel" : "Edit"}
                       </Button>
-                      <Button onClick={handleGenerateAdCopy} disabled={isLoading}>
-                        {isLoading ? "Generating Ad Copy..." : "Generate Ad Copy"}
+                      <Button onClick={handleGenerateAdCopy} disabled={isGeneratingAdCopy}>
+                        {isGeneratingAdCopy ? "Generating Ad Copy..." : "Generate Ad Copy"}
                       </Button>
                     </div>
                     {isEditing && (
@@ -270,8 +275,8 @@ export default function Dashboard() {
                           placeholder="Enter instructions to refine the plan..."
                           className="mb-2"
                         />
-                        <Button onClick={handleRefine} disabled={isLoading}>
-                          {isLoading ? "Refining..." : "Submit Refinement"}
+                        <Button onClick={handleRefine} disabled={isRefining}>
+                          {isRefining ? "Refining..." : "Submit Refinement"}
                         </Button>
                       </div>
                     )}
@@ -315,8 +320,8 @@ export default function Dashboard() {
                   placeholder="Enter a prompt to generate an image..."
                   className="mb-2"
                 />
-                <Button onClick={handleGenerateImage} disabled={isLoading}>
-                  {isLoading ? "Generating..." : "Generate Image"}
+                <Button onClick={handleGenerateImage} disabled={isGeneratingImage}>
+                  {isGeneratingImage ? "Generating..." : "Generate Image"}
                 </Button>
                 {generatedImage && (
                   <div className="mt-4">
@@ -330,7 +335,9 @@ export default function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Campaign Performance</CardTitle>
-                <CardDescription>Overview of your simulated campaign metrics</CardDescription>
+                <CardDescription>
+                  Overview of your simulated campaign metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -352,11 +359,11 @@ export default function Dashboard() {
                   ))}
                 </div>
                 <div className="mt-4 flex space-x-2">
-                  <Button onClick={handleGetRecommendations} disabled={isLoading}>
-                    {isLoading ? "Generating..." : "Get AI Recommendations"}
+                  <Button onClick={handleGetRecommendations} disabled={isGettingRecommendations}>
+                    {isGettingRecommendations ? "Generating..." : "Get AI Recommendations"}
                   </Button>
-                  <Button onClick={handleRunMonitoringAgent} disabled={!processedData || isLoading}>
-                    {isLoading ? "Running..." : "Run Monitoring Agent"}
+                  <Button onClick={handleRunMonitoringAgent} disabled={!processedData || isRunningMonitoringAgent}>
+                    {isRunningMonitoringAgent ? "Running..." : "Run Monitoring Agent"}
                   </Button>
                 </div>
                 {recommendations && (

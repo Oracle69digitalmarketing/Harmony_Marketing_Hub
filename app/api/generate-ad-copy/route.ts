@@ -1,29 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
-
-async function invokeClaude(prompt: string) {
-  const command = new InvokeModelCommand({
-    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
-    contentType: "application/json",
-    accept: "application/json",
-    body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 2000,
-      messages: [
-        {
-          role: "user",
-          content: [{ type: "text", text: prompt }],
-        },
-      ],
-    }),
-  });
-
-  const { body } = await bedrockClient.send(command);
-  const responseBody = JSON.parse(new TextDecoder().decode(body));
-  return JSON.parse(responseBody.content[0].text);
-}
+import { invokeClaude } from "@/lib/bedrock";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +17,8 @@ export async function POST(request: NextRequest) {
     Each key should contain an object with "headline" and "body" properties.
     Business Plan: ${JSON.stringify(businessPlan)}`;
 
-    const adCopy = await invokeClaude(prompt);
+    const adCopyText = await invokeClaude(prompt);
+    const adCopy = JSON.parse(adCopyText);
 
     return NextResponse.json(adCopy);
   } catch (error: any) {

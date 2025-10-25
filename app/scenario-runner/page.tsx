@@ -27,13 +27,13 @@ export default function ScenarioRunnerPage() {
   const [timeframe, setTimeframe] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isRunningScenario, setIsRunningScenario] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleRunScenario = async () => {
     if (!goal) return;
 
-    setIsLoading(true);
+    setIsRunningScenario(true);
     setError(null);
     setGeneratedPlan(null);
 
@@ -57,7 +57,7 @@ export default function ScenarioRunnerPage() {
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsRunningScenario(false);
     }
   };
 
@@ -104,8 +104,8 @@ export default function ScenarioRunnerPage() {
                       </Select>
                     </div>
                   </div>
-                  <Button onClick={handleRunScenario} disabled={isLoading || !goal || !budget || !timeframe || !riskLevel}>
-                    {isLoading ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Run Scenario"}
+                  <Button onClick={handleRunScenario} disabled={isRunningScenario || !goal || !budget || !timeframe || !riskLevel}>
+                    {isRunningScenario ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Run Scenario"}
                   </Button>
                 </div>
 

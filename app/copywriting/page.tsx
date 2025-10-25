@@ -11,13 +11,13 @@ import { Loader } from "lucide-react"
 export default function CopywritingPage() {
   const [prompt, setPrompt] = useState("");
   const [generatedCopy, setGeneratedCopy] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateCopy = async () => {
     if (!prompt) return;
 
-    setIsLoading(true);
+    setIsGeneratingCopy(true);
     setError(null);
     setGeneratedCopy("");
 
@@ -40,7 +40,7 @@ export default function CopywritingPage() {
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsGeneratingCopy(false);
     }
   };
 
@@ -64,8 +64,8 @@ export default function CopywritingPage() {
                     placeholder="e.g., 'Write a catchy headline for a new line of sustainable sneakers.'"
                     className="mb-2"
                   />
-                  <Button onClick={handleGenerateCopy} disabled={isLoading || !prompt}>
-                    {isLoading ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate Copy"}
+                  <Button onClick={handleGenerateCopy} disabled={isGeneratingCopy || !prompt}>
+                    {isGeneratingCopy ? <><Loader className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate Copy"}
                   </Button>
                 </div>
 

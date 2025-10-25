@@ -1,39 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
+import { invokeClaude } from "@/lib/bedrock";
 
-const dynamoClient = new DynamoDBClient({ region: process.env.REGION });
-
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
-
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.REGION });
-
-async function invokeClaude(prompt: string) {
-  const command = new InvokeModelCommand({
-    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
-    contentType: "application/json",
-    accept: "application/json",
-    body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 2000, // Increased token limit for refinement
-      messages: [
-        {
-          role: "user",
-          content: [{ type: "text", text: prompt }],
-        },
-      ],
-    }),
-  });
-
-  const { body } = await bedrockClient.send(command);
-  const responseBody = JSON.parse(new TextDecoder().decode(body));
-  try {
-    return JSON.parse(responseBody.content[0].text);
-  } catch (e) {
-    return responseBody.content[0].text;
-  }
-}
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -70,7 +41,8 @@ User's refinement instruction:
 Based on the instruction, refine the plan and return the updated plan as a single JSON object. Do not add any extra text or explanations.`;
 
     // 3. Get the refined plan from Bedrock
-    const refinedPlan = await invokeClaude(prompt);
+    const refinedPlanText = await invokeClaude(prompt);
+    const refinedPlan = JSON.parse(refinedPlanText);
 
     // 4. Update the plan in DynamoDB
     const updateCommand = new UpdateCommand({
