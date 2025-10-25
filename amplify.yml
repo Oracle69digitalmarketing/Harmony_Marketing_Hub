@@ -15,7 +15,7 @@ frontend:
         - echo "Building Harmony Marketing Hub for eu-central-1"
         - npm run build
   artifacts:
-    baseDirectory: build
+    baseDirectory: .next
     files:
       - '**/*'
   cache:
