@@ -3,16 +3,17 @@ backend:
   phases:
     preBuild:
       commands:
+        - echo "🧹 Cleaning backup and preparing backend..."
         - rm -rf amplify-backup
 frontend:
   phases:
     preBuild:
       commands:
-        - echo "Installing dependencies..."
+        - echo "📦 Installing dependencies..."
         - npm ci
     build:
       commands:
-        - echo "Building Harmony Marketing Hub for eu-central-1"
+        - echo "🚀 Building Harmony Marketing Hub for eu-central-1"
         - npm run build
   artifacts:
     baseDirectory: .next
@@ -21,10 +22,24 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'no-cache, no-store, must-revalidate'
 environment:
   variables:
+    # AWS Config
+    AWS_DEFAULT_REGION: eu-central-1
     REACT_APP_AWS_REGION: eu-central-1
+
+    # Bedrock Agents
     REACT_APP_BEDROCK_AGENT_GROWTH: 3AIZNPULT4
     REACT_APP_BEDROCK_AGENT_COMPETITOR: YJW2SSY6FS
     REACT_APP_BEDROCK_AGENT_SOCIAL: JC4WZAOTJ6
-    AWS_DEFAULT_REGION: eu-central-1
+
+    # NextAuth / GitHub Auth
+    GITHUB_ID: Ov23libwD9Y2eKUL6BXJ
+    GITHUB_SECRET: f9e35f4de9ac4cc115a1ed0f1bb897e32e06b031
+    NEXTAUTH_SECRET: z1kV7uKrdrdrODrbOV/5qkinIS6j6WG6RLbbxuBJtW8=
+    NEXTAUTH_URL: https://main.d2xqe9qe371d51.amplifyapp.com
