@@ -1,4 +1,9 @@
 version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - rm -rf amplify-backup
 frontend:
   phases:
     preBuild:
